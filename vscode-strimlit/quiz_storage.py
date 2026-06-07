@@ -392,133 +392,6 @@ QUIZ_G4 = [
 ]
 
 # ============================================
-# GOLONGAN V - 20 SOAL
-# ============================================
-
-QUIZ_G5 = [
-    {
-        "question": "Kation manakah yang termasuk Golongan V?",
-        "options": ["Ag⁺, Pb²⁺", "Fe³⁺, Al³⁺", "Ba²⁺, Sr²⁺", "Mg²⁺, K⁺, Na⁺, NH₄⁺"],
-        "correct": 3,
-        "explanation": "Golongan V terdiri dari kation yang tidak terendap oleh reagen Golongan I-IV: Mg²⁺, K⁺, Na⁺, dan NH₄⁺."
-    },
-    {
-        "question": "Reagen apa yang digunakan untuk mengkonfirmasi Mg²⁺?",
-        "options": ["KSCN", "NH₄OH + (NH₄)₂HPO₄", "K₂CrO₄", "NaOH + H₂O₂"],
-        "correct": 1,
-        "explanation": "Mg²⁺ membentuk endapan putih kristalin MgNH₄PO₄·6H₂O dengan NH₄OH dan fosfat amonium."
-    },
-    {
-        "question": "Apa nama endapan yang terbentuk saat Mg²⁺ direaksikan dengan fosfat amonium?",
-        "options": ["Magnesium oksalat", "Magnesium amonium fosfat (struvit)", "Magnesium karbonat", "Magnesium kromat"],
-        "correct": 1,
-        "explanation": "MgNH₄PO₄·6H₂O disebut magnesium amonium fosfat atau struvit."
-    },
-    {
-        "question": "Reagen apa yang digunakan untuk mengkonfirmasi K⁺?",
-        "options": ["Asam tartrat atau kobaltinitrit", "KSCN", "NH₄OH", "HCl"],
-        "correct": 0,
-        "explanation": "K⁺ membentuk endapan putih KHC₄H₄O₆ dengan asam tartrat atau endapan kuning dengan Na₃[Co(NO₂)₆]."
-    },
-    {
-        "question": "Apa warna endapan yang terbentuk saat Na⁺ direaksikan dengan asetat uranil seng?",
-        "options": ["Putih", "Kuning", "Merah", "Hitam"],
-        "correct": 1,
-        "explanation": "NaZn(UO₂)₃(CH₃COO)₉·6H₂O membentuk kristal kuning yang mengkonfirmasi Na⁺."
-    },
-    {
-        "question": "Bagaimana cara menguji keberadaan NH₄⁺?",
-        "options": ["Tambahkan HCl", "Tambahkan NaOH dan panaskan", "Tambahkan K₂CrO₄", "Tambahkan NH₄OH"],
-        "correct": 1,
-        "explanation": "NH₄⁺ + OH⁻ → NH₃↑ + H₂O. Gas NH₃ berbau tajam dan merahkan lakmus merah basah."
-    },
-    {
-        "question": "Mengapa Golongan V tidak memiliki reagen pengendap spesifik seperti golongan lainnya?",
-        "options": ["Karena kationnya tidak bereaksi", "Karena semua garamnya larut dalam air", "Karena tidak ada reagen yang cocok", "Karena kationnya tidak stabil"],
-        "correct": 1,
-        "explanation": "Garam-garam kation Golongan V umumnya larut dalam air sehingga tidak dapat dipisahkan dengan pengendapan."
-    },
-    {
-        "question": "Apa yang terjadi jika sampel mengandung NH₄⁺ saat menguji Golongan III?",
-        "options": ["Tidak ada pengaruh", "NH₄⁺ akan mengganggu pengujian", "NH₄⁺ akan terendap", "NH₄⁺ akan teroksidasi"],
-        "correct": 1,
-        "explanation": "NH₄⁺ dapat mengganggu pengujian karena juga bereaksi dengan beberapa reagen. Sampel harus diuapkan dengan NaOH terlebih dahulu untuk menghilangkan NH₄⁺."
-    },
-    {
-        "question": "Kation manakah yang paling sulit dikonfirmasi secara spesifik?",
-        "options": ["Mg²⁺", "K⁺", "Na⁺", "NH₄⁺"],
-        "correct": 2,
-        "explanation": "Na⁺ sulit dikonfirmasi karena tidak memiliki reaksi warna yang khas dan harus menggunakan reagen khusus seperti asetat uranil seng."
-    },
-    {
-        "question": "Apa yang dimaksud dengan 'kation residu' dalam analisis Golongan V?",
-        "options": ["Kation yang sudah terendap", "Kation yang tersisa setelah pengendapan golongan I-IV", "Kation yang tidak bereaksi", "Kation yang sudah teroksidasi"],
-        "correct": 1,
-        "explanation": "Golongan V adalah kation-kation yang tersisa (residu) dalam larutan setelah semua pengendapan Golongan I-IV selesai."
-    },
-    {
-        "question": "Apa nama kristal kuning yang terbentuk dari Na⁺ dan asetat uranil seng?",
-        "options": ["Natrium klorida", "Asetat uranil seng natrium", "Natrium sulfat", "Natrium karbonat"],
-        "correct": 1,
-        "explanation": "NaZn(UO₂)₃(CH₃COO)₉·6H₂O disebut asetat uranil seng natrium."
-    },
-    {
-        "question": "Mengapa Mg²⁺ tidak ikut terendap dalam Golongan III meskipun ada NH₄OH?",
-        "options": ["Karena Mg²⁺ tidak bereaksi", "Karena [OH⁻] ditekan oleh NH₄Cl", "Karena Mg²⁺ sudah terendap", "Karena terbentuk kompleks"],
-        "correct": 1,
-        "explanation": "NH₄Cl menekan [OH⁻] sehingga Mg(OH)₂ tidak terendap (Ksp Mg(OH)₂ relatif besar)."
-    },
-    {
-        "question": "Apa warna endapan KHC₄H₄O₆?",
-        "options": ["Kuning", "Putih", "Merah", "Hitam"],
-        "correct": 1,
-        "explanation": "KHC₄H₄O₆ (asam tartrat kalium) membentuk endapan putih."
-    },
-    {
-        "question": "Gas apa yang terbentuk saat NH₄⁺ direaksikan dengan NaOH dan dipanaskan?",
-        "options": ["H₂", "O₂", "NH₃", "CO₂"],
-        "correct": 2,
-        "explanation": "NH₄⁺ + OH⁻ → NH₃↑ + H₂O. Gas amonia (NH₃) berbau tajam."
-    },
-    {
-        "question": "Apa sifat khas gas NH₃?",
-        "options": ["Tidak berbau", "Berbau tajam dan basa", "Berbau manis", "Berbau asam"],
-        "correct": 1,
-        "explanation": "NH₃ berbau tajam ( menusak) dan bersifat basa (merahkan lakmus merah basah)."
-    },
-    {
-        "question": "Mengapa K⁺ sulit dipisahkan dengan pengendapan biasa?",
-        "options": ["Karena semua garam K⁺ larut", "Karena K⁺ tidak membentuk endapan dengan reagen umum", "Karena K⁺ terlalu stabil", "Karena K⁺ terlalu reaktif"],
-        "correct": 1,
-        "explanation": "K⁺ tidak membentuk endapan dengan reagen pengendap umum sehingga memerlukan reagen khusus seperti asam tartrat."
-    },
-    {
-        "question": "Apa nama senyawa Na₃[Co(NO₂)₆]?",
-        "options": ["Kobaltinitrit natrium", "Asetat uranil", "Fosfat amonium", "Asam tartrat"],
-        "correct": 0,
-        "explanation": "Na₃[Co(NO₂)₆] adalah kobaltinitrit natrium yang digunakan untuk menguji K⁺."
-    },
-    {
-        "question": "Apa warna endapan yang terbentuk saat K⁺ direaksikan dengan kobaltinitrit?",
-        "options": ["Putih", "Kuning", "Merah", "Hijau"],
-        "correct": 1,
-        "explanation": "K₂Na[Co(NO₂)₆] membentuk endapan kuning."
-    },
-    {
-        "question": "Mengapa Mg²⁺ termasuk Golongan V bukan Golongan IV?",
-        "options": ["Karena Mg²⁺ tidak membentuk karbonat", "Karena MgCO₃ larut dalam kondisi pengendapan G-IV", "Karena Mg²⁺ tidak bereaksi", "Karena Mg²⁺ terlalu kecil"],
-        "correct": 1,
-        "explanation": "MgCO₃ dapat larut dalam kondisi pengendapan Golongan IV karena adanya NH₄Cl, sehingga Mg²⁺ tetap dalam larutan dan masuk Golongan V."
-    },
-    {
-        "question": "Apa yang harus dilakukan jika sampel mengandung NH₄⁺ sebelum analisis Golongan III?",
-        "options": ["Tambahkan lebih banyak NH₄OH", "Uapkan dengan NaOH untuk menghilangkan NH₄⁺", "Tambahkan HCl", "Panaskan sampai kering"],
-        "correct": 1,
-        "explanation": "NH₄⁺ harus dihilangkan terlebih dahulu dengan penguapan menggunakan NaOH agar tidak mengganggu analisis Golongan III."
-    }
-]
-
-# ============================================
 # FUNGSI UNTUK MENGAMBIL SOAL ACAK
 # ============================================
 
@@ -527,7 +400,7 @@ def get_random_questions(group_name, num_questions=10):
     Mengambil soal secara acak dari bank soal.
     
     Parameters:
-        group_name (str): Nama golongan ("Golongan I", "Golongan III", "Golongan IV", "Golongan V")
+        group_name (str): Nama golongan ("Golongan I", "Golongan III", "Golongan IV")
         num_questions (int): Jumlah soal yang diambil (default: 10)
     
     Returns:
@@ -536,8 +409,7 @@ def get_random_questions(group_name, num_questions=10):
     group_map = {
         "Golongan I": QUIZ_G1,
         "Golongan III": QUIZ_G3,
-        "Golongan IV": QUIZ_G4,
-        "Golongan V": QUIZ_G5
+        "Golongan IV": QUIZ_G4
     }
     
     if group_name not in group_map:
@@ -561,8 +433,7 @@ def get_all_questions(group_name):
     group_map = {
         "Golongan I": QUIZ_G1,
         "Golongan III": QUIZ_G3,
-        "Golongan IV": QUIZ_G4,
-        "Golongan V": QUIZ_G5
+        "Golongan IV": QUIZ_G4
     }
     return group_map.get(group_name, [])
 
@@ -572,6 +443,5 @@ def get_total_questions():
         "Golongan I": len(QUIZ_G1),
         "Golongan III": len(QUIZ_G3),
         "Golongan IV": len(QUIZ_G4),
-        "Golongan V": len(QUIZ_G5),
-        "TOTAL": len(QUIZ_G1) + len(QUIZ_G3) + len(QUIZ_G4) + len(QUIZ_G5)
+        "TOTAL": len(QUIZ_G1) + len(QUIZ_G3) + len(QUIZ_G4) 
     }
