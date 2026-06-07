@@ -11,78 +11,425 @@ from quiz_storage import get_random_questions
 # KONFIGURASI HALAMAN
 # ============================================
 st.set_page_config(
-    page_title="Analisis Kation Golongan I, III, IV, V",
-    page_icon="🧪",
+    page_title="Analisis Kation Golongan I, III, IV",
+    page_icon="⚗️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ============================================
-# CSS CUSTOM
+# INISIALISASI THEME
 # ============================================
-st.markdown("""
-<style>
-    .main-header {
-        font-size: 3rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #ff7f0e;
-        margin-bottom: 1rem;
-    }
-    .reaction-box {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 10px;
-        border-left: 5px solid #1f77b4;
-        margin: 0.5rem 0;
-    }
-    .cation-card {
-        background-color: #ffffff;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin: 1rem 0;
-        border: 2px solid #e0e0e0;
-    }
-    .quiz-option {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 0.5rem 0;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    .quiz-option:hover {
-        background-color: #e3f2fd;
-        transform: translateX(5px);
-    }
-    .correct {
-        background-color: #c8e6c9 !important;
-        border: 2px solid #4caf50;
-    }
-    .wrong {
-        background-color: #ffcdd2 !important;
-        border: 2px solid #f44336;
-    }
-    .precipitate-white { color: #9e9e9e; font-weight: bold; }
-    .precipitate-yellow { color: #ffc107; font-weight: bold; }
-    .precipitate-black { color: #212121; font-weight: bold; }
-    .precipitate-brown { color: #8D6E63; font-weight: bold; }
-    .solution-red { color: #f44336; font-weight: bold; }
-</style>
-""", unsafe_allow_html=True)
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
 
 # ============================================
-# DATA KATION (SUDAH DIKOREKSI)
+# CSS DINAMIS BERDASARKAN TEMA
+# ============================================
+def get_css(dark_mode):
+    if dark_mode:
+        bg_primary     = "#0f1117"
+        bg_secondary   = "#1a1d27"
+        bg_card        = "#1e2130"
+        bg_reaction    = "#151825"
+        text_primary   = "#e8eaf6"
+        text_secondary = "#9fa8da"
+        border_color   = "#2d3561"
+        accent_blue    = "#5c7cfa"
+        accent_orange  = "#ff8c42"
+        accent_green   = "#56cf86"
+        accent_red     = "#ff6b6b"
+        accent_yellow  = "#ffd93d"
+        accent_teal    = "#4ecdc4"
+        header_bg      = "linear-gradient(135deg, #1a1d27 0%, #0f1117 100%)"
+        sidebar_bg     = "#13161f"
+        table_alt      = "#252840"
+        table_header   = "#1f2235"
+        info_bg        = "rgba(92,124,250,0.15)"
+        info_border    = "#5c7cfa"
+        warning_bg     = "rgba(255,140,66,0.15)"
+        warning_border = "#ff8c42"
+        success_bg     = "rgba(86,207,134,0.15)"
+        success_border = "#56cf86"
+        correct_bg     = "rgba(86,207,134,0.2)"
+        wrong_bg       = "rgba(255,107,107,0.2)"
+        quiz_hover     = "rgba(92,124,250,0.15)"
+        toggle_bg      = "#2d3561"
+        bubble_color   = "rgba(92,124,250,0.08)"
+    else:
+        bg_primary     = "#f4f6fb"
+        bg_secondary   = "#ffffff"
+        bg_card        = "#ffffff"
+        bg_reaction    = "#f0f4ff"
+        text_primary   = "#1a1a2e"
+        text_secondary = "#4a5568"
+        border_color   = "#d0d9f0"
+        accent_blue    = "#3a5bd9"
+        accent_orange  = "#e05c00"
+        accent_green   = "#1a9e56"
+        accent_red     = "#d32f2f"
+        accent_yellow  = "#b8860b"
+        accent_teal    = "#00796b"
+        header_bg      = "linear-gradient(135deg, #dde8ff 0%, #f4f6fb 100%)"
+        sidebar_bg     = "#eaefff"
+        table_alt      = "#f0f4ff"
+        table_header   = "#3a5bd9"
+        info_bg        = "rgba(58,91,217,0.08)"
+        info_border    = "#3a5bd9"
+        warning_bg     = "rgba(224,92,0,0.08)"
+        warning_border = "#e05c00"
+        success_bg     = "rgba(26,158,86,0.08)"
+        success_border = "#1a9e56"
+        correct_bg     = "rgba(26,158,86,0.12)"
+        wrong_bg       = "rgba(211,47,47,0.12)"
+        quiz_hover     = "rgba(58,91,217,0.08)"
+        toggle_bg      = "#d0d9f0"
+        bubble_color   = "rgba(58,91,217,0.05)"
+
+    return f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap');
+
+/* ========== GLOBAL RESET ========== */
+*, *::before, *::after {{ box-sizing: border-box; }}
+
+/* ========== APP BACKGROUND ========== */
+.stApp {{
+    background: {bg_primary} !important;
+    font-family: 'Space Grotesk', sans-serif;
+}}
+
+/* Sidebar */
+[data-testid="stSidebar"] {{
+    background: {sidebar_bg} !important;
+    border-right: 2px solid {border_color};
+}}
+[data-testid="stSidebar"] * {{
+    color: {text_primary} !important;
+}}
+
+/* Main content background */
+.main .block-container {{
+    background: transparent !important;
+    padding-top: 2rem;
+}}
+
+/* ========== TYPOGRAPHY ========== */
+h1, h2, h3, h4 {{
+    font-family: 'Space Grotesk', sans-serif;
+    color: {text_primary};
+}}
+
+p, li, td, th, label, div {{
+    color: {text_primary};
+}}
+
+/* ========== HEADER ========== */
+.main-header {{
+    background: {header_bg};
+    border: 2px solid {border_color};
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}}
+.main-header::before {{
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, {bubble_color} 0%, transparent 60%),
+                radial-gradient(circle at 70% 50%, {bubble_color} 0%, transparent 60%);
+    pointer-events: none;
+}}
+.main-header h1 {{
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    color: {accent_blue};
+    margin: 0 0 0.5rem 0;
+    position: relative;
+}}
+.main-header p {{
+    color: {text_secondary};
+    font-size: 1rem;
+    margin: 0;
+    position: relative;
+}}
+
+/* ========== CARDS ========== */
+.cation-card {{
+    background: {bg_card};
+    border: 1.5px solid {border_color};
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 16px rgba(0,0,0,{0.25 if dark_mode else 0.06});
+    transition: box-shadow 0.3s ease;
+}}
+.cation-card:hover {{
+    box-shadow: 0 6px 28px rgba(0,0,0,{0.35 if dark_mode else 0.10});
+}}
+
+/* ========== REACTION BOX ========== */
+.reaction-box {{
+    background: {bg_reaction};
+    border-left: 4px solid {accent_blue};
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin: 0.6rem 0;
+    font-size: 0.95rem;
+    color: {text_primary};
+}}
+
+/* ========== INFO / WARNING / SUCCESS BOXES ========== */
+.info-box {{
+    background: {info_bg};
+    border: 1.5px solid {info_border};
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0;
+    color: {text_primary};
+}}
+.warning-box {{
+    background: {warning_bg};
+    border: 1.5px solid {warning_border};
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0;
+    color: {text_primary};
+}}
+.success-box {{
+    background: {success_bg};
+    border: 1.5px solid {success_border};
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 0.8rem 0;
+    color: {text_primary};
+}}
+
+/* ========== QUIZ OPTIONS ========== */
+.quiz-option {{
+    background: {bg_card};
+    border: 1.5px solid {border_color};
+    border-radius: 10px;
+    padding: 0.9rem 1.2rem;
+    margin: 0.5rem 0;
+    cursor: pointer;
+    transition: all 0.25s;
+    color: {text_primary};
+}}
+.quiz-option:hover {{ background: {quiz_hover}; border-color: {accent_blue}; }}
+.correct {{ background: {correct_bg} !important; border: 2px solid {accent_green} !important; }}
+.wrong   {{ background: {wrong_bg} !important;   border: 2px solid {accent_red} !important;   }}
+
+/* ========== TABLE ========== */
+.styled-table {{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: {text_primary};
+}}
+.styled-table th {{
+    background: {table_header};
+    color: {'#fff' if not dark_mode else text_primary};
+    padding: 12px 14px;
+    border: 1px solid {border_color};
+    text-align: left;
+    font-weight: 600;
+}}
+.styled-table td {{
+    padding: 10px 14px;
+    border: 1px solid {border_color};
+    color: {text_primary};
+}}
+.styled-table tr:nth-child(even) td {{ background: {table_alt}; }}
+.styled-table tr:hover td {{ background: {quiz_hover}; }}
+
+/* ========== PRECIPITATE COLORS ========== */
+.p-white  {{ color: {'#aaa' if dark_mode else '#777'}; font-weight: 700; }}
+.p-yellow {{ color: {accent_yellow}; font-weight: 700; }}
+.p-black  {{ color: {'#ccc' if dark_mode else '#222'}; font-weight: 700; }}
+.p-brown  {{ color: #a1887f; font-weight: 700; }}
+.p-red    {{ color: {accent_red}; font-weight: 700; }}
+.p-green  {{ color: {accent_green}; font-weight: 700; }}
+.p-teal   {{ color: {accent_teal}; font-weight: 700; }}
+
+/* ========== GOLONGAN BADGES ========== */
+.badge {{
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+}}
+.badge-I   {{ background: rgba(255,107,107,0.2); color: {accent_red}; border: 1px solid {accent_red}; }}
+.badge-III {{ background: rgba(78,205,196,0.2); color: {accent_teal}; border: 1px solid {accent_teal}; }}
+.badge-IV  {{ background: rgba(255,217,61,0.2); color: {accent_yellow}; border: 1px solid {accent_yellow}; }}
+
+/* ========== STEP INDICATOR ========== */
+.step-num {{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: {accent_blue};
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+}}
+
+/* ========== DIGITALISASI - QUESTION BOX ========== */
+.q-box {{
+    background: {bg_card};
+    border: 2px solid {accent_blue};
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}}
+.q-box h3 {{
+    color: {accent_blue};
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}}
+
+/* ========== RESULT BOX ========== */
+.result-box {{
+    background: {success_bg};
+    border: 2px solid {success_border};
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}}
+.result-box h2 {{ color: {accent_green}; font-size: 1.8rem; }}
+.result-box .ion {{ font-size: 2.5rem; font-weight: 700; color: {accent_blue}; font-family: 'JetBrains Mono', monospace; }}
+
+/* ========== MONO CODE ========== */
+.mono {{
+    font-family: 'JetBrains Mono', monospace;
+    background: {bg_reaction};
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: {accent_orange};
+}}
+
+/* ========== THEME TOGGLE ========== */
+.theme-status {{
+    background: {toggle_bg};
+    border-radius: 10px;
+    padding: 8px 14px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: {text_secondary};
+    margin-bottom: 10px;
+}}
+
+/* ========== STREAMLIT OVERRIDES ========== */
+.stButton > button {{
+    background: {accent_blue} !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600 !important;
+    transition: opacity 0.2s !important;
+}}
+.stButton > button:hover {{ opacity: 0.85 !important; }}
+
+.stSelectbox > div > div {{
+    background: {bg_card} !important;
+    border-color: {border_color} !important;
+    color: {text_primary} !important;
+    border-radius: 10px !important;
+}}
+.stSelectbox label {{ color: {text_primary} !important; }}
+
+.stTabs [data-baseweb="tab-list"] {{
+    background: {bg_secondary} !important;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+}}
+.stTabs [data-baseweb="tab"] {{
+    background: transparent !important;
+    color: {text_secondary} !important;
+    border-radius: 8px !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 500 !important;
+}}
+.stTabs [aria-selected="true"] {{
+    background: {accent_blue} !important;
+    color: #fff !important;
+}}
+
+.stExpander {{
+    background: {bg_card} !important;
+    border: 1.5px solid {border_color} !important;
+    border-radius: 12px !important;
+}}
+.stExpander summary {{ color: {text_primary} !important; }}
+
+.stRadio > div {{ gap: 6px; }}
+.stRadio label {{ color: {text_primary} !important; }}
+
+.stProgress > div > div > div {{
+    background: {accent_blue} !important;
+}}
+
+/* Sidebar radio */
+[data-testid="stSidebar"] .stRadio label {{
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    transition: background 0.2s !important;
+}}
+[data-testid="stSidebar"] .stRadio label:hover {{
+    background: {quiz_hover} !important;
+}}
+
+/* Input / text area */
+.stTextInput input, .stTextArea textarea {{
+    background: {bg_card} !important;
+    color: {text_primary} !important;
+    border-color: {border_color} !important;
+    border-radius: 10px !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+}}
+
+/* Multiselect */
+.stMultiSelect [data-baseweb="select"] {{
+    background: {bg_card} !important;
+}}
+
+/* Hide default streamlit elements */
+#MainMenu {{ visibility: hidden; }}
+footer {{ visibility: hidden; }}
+header {{ visibility: hidden; }}
+
+/* Column gap */
+[data-testid="column"] {{ padding: 0 0.5rem; }}
+</style>
+"""
+
+st.markdown(get_css(st.session_state.dark_mode), unsafe_allow_html=True)
+
+# ============================================
+# DATA KATION
 # ============================================
 
 cation_data = {
-    "Golongan I (Ag⁺, Pb²⁺, Hg₂²⁺)": {
+    "Golongan I": {
+        "label": "Ag⁺, Pb²⁺, Hg₂²⁺",
         "color": "#FF6B6B",
         "reagen": "HCl encer",
         "precipitate": "AgCl (putih), PbCl₂ (putih), Hg₂Cl₂ (putih)",
@@ -90,81 +437,83 @@ cation_data = {
             {
                 "action": "Tambahkan HCl encer ke sampel",
                 "result": "Terbentuk endapan putih: AgCl, PbCl₂, Hg₂Cl₂",
-                "filtrate": "Filtrat menuju Golongan II (dilewati dalam analisis ini)",
+                "filtrate": "Filtrat → Golongan III (setelah skip Golongan II)",
                 "residue": "AgCl, PbCl₂, Hg₂Cl₂"
             },
             {
                 "action": "Tambahkan H₂O panas pada endapan",
-                "result": "PbCl₂ larut (kelarutan meningkat dengan suhu), AgCl dan Hg₂Cl₂ tidak larut",
-                "filtrate": "Pb²⁺",
+                "result": "PbCl₂ larut, AgCl dan Hg₂Cl₂ tidak larut",
+                "filtrate": "Pb²⁺ (larut)",
                 "residue": "AgCl, Hg₂Cl₂"
             },
             {
                 "action": "Pada filtrat Pb²⁺: Tambahkan K₂CrO₄",
                 "result": "Endapan kuning PbCrO₄",
-                "confirm": "Pb²⁺ terkonfirmasi"
+                "confirm": "Pb²⁺ terkonfirmasi ✅"
             },
             {
                 "action": "Pada residu AgCl, Hg₂Cl₂: Tambahkan NH₄OH",
-                "result": "AgCl larut membentuk [Ag(NH₃)₂]⁺, Hg₂Cl₂ berubah menjadi Hg (hitam) + Hg(NH₂)Cl (putih)",
+                "result": "AgCl larut → [Ag(NH₃)₂]⁺; Hg₂Cl₂ → Hg (hitam) + Hg(NH₂)Cl (putih)",
                 "filtrate": "[Ag(NH₃)₂]⁺",
-                "residue": "Hg (hitam) + Hg(NH₂)Cl (putih)"
+                "residue": "Hg + Hg(NH₂)Cl"
             },
             {
                 "action": "Pada filtrat [Ag(NH₃)₂]⁺: Tambahkan HNO₃",
-                "result": "Endapan putih AgCl kembali terbentuk",
-                "confirm": "Ag⁺ terkonfirmasi"
+                "result": "Endapan putih AgCl terbentuk kembali",
+                "confirm": "Ag⁺ terkonfirmasi ✅"
             }
         ]
     },
-    "Golongan III (Fe³⁺, Al³⁺, Cr³⁺)": {
+    "Golongan III": {
+        "label": "Fe³⁺, Al³⁺, Cr³⁺",
         "color": "#4ECDC4",
         "reagen": "NH₄OH berlebih + NH₄Cl",
-        "precipitate": "Fe(OH)₃ (coklat/merah), Al(OH)₃ (putih/gel), Cr(OH)₃ (abu-abu/hijau)",
+        "precipitate": "Fe(OH)₃ (coklat), Al(OH)₃ (putih/gel), Cr(OH)₃ (abu-abu/hijau)",
         "steps": [
             {
-                "action": "Tambahkan NH₄OH + NH₄Cl pada filtrat dari Golongan II",
-                "result": "Fe(OH)₃ (coklat), Al(OH)₃ (putih/gel), Cr(OH)₃ (abu-abu/hijau) terendap. NH₄Cl menekan [OH⁻] agar Mg²⁺ tidak ikut terendap sebagai Mg(OH)₂",
-                "filtrate": "Filtrat menuju Golongan IV (Mg²⁺, K⁺, Na⁺, NH₄⁺)",
+                "action": "Tambahkan NH₄OH + NH₄Cl pada filtrat",
+                "result": "Fe(OH)₃ (coklat), Al(OH)₃ (putih/gel), Cr(OH)₃ (abu-abu) terendap",
+                "filtrate": "Filtrat → Golongan IV",
                 "residue": "Fe(OH)₃, Al(OH)₃, Cr(OH)₃"
             },
             {
-                "action": "Pada endapan: Tambahkan NaOH berlebih + H₂O₂",
-                "result": "Al(OH)₃ larut → [Al(OH)₄]⁻, Cr(OH)₃ → CrO₄²⁻ (larut), Fe(OH)₃ tidak larut",
+                "action": "Tambahkan NaOH berlebih + H₂O₂ pada endapan",
+                "result": "Al(OH)₃ → [Al(OH)₄]⁻, Cr(OH)₃ → CrO₄²⁻ (keduanya larut), Fe(OH)₃ tidak larut",
                 "filtrate": "[Al(OH)₄]⁻, CrO₄²⁻",
                 "residue": "Fe(OH)₃"
             },
             {
                 "action": "Pada residu Fe(OH)₃: Tambahkan HCl + KSCN",
                 "result": "Larutan merah darah [Fe(SCN)]²⁺",
-                "confirm": "Fe³⁺ terkonfirmasi"
+                "confirm": "Fe³⁺ terkonfirmasi ✅"
             },
             {
-                "action": "Pada filtrat [Al(OH)₄]⁻: Tambahkan HCl (asam) perlahan",
-                "result": "Endapan putih/gel Al(OH)₃ kembali",
-                "confirm": "Al³⁺ terkonfirmasi"
+                "action": "Pada filtrat [Al(OH)₄]⁻: Tambahkan HCl perlahan",
+                "result": "Endapan putih/gel Al(OH)₃ kembali terbentuk",
+                "confirm": "Al³⁺ terkonfirmasi ✅"
             },
             {
                 "action": "Pada filtrat CrO₄²⁻: Tambahkan Pb(NO₃)₂",
                 "result": "Endapan kuning PbCrO₄",
-                "confirm": "Cr³⁺ terkonfirmasi"
+                "confirm": "Cr³⁺ terkonfirmasi ✅"
             }
         ]
     },
-    "Golongan IV (Ba²⁺, Sr²⁺, Ca²⁺)": {
+    "Golongan IV": {
+        "label": "Ba²⁺, Sr²⁺, Ca²⁺",
         "color": "#FFD93D",
         "reagen": "(NH₄)₂CO₃ + NH₄OH + NH₄Cl",
         "precipitate": "BaCO₃ (putih), SrCO₃ (putih), CaCO₃ (putih)",
         "steps": [
             {
-                "action": "Tambahkan (NH₄)₂CO₃ + NH₄OH + NH₄Cl pada filtrat dari Golongan III",
-                "result": "BaCO₃, SrCO₃, CaCO₃ terendap putih. NH₄Cl mencegah pengendapan MgCO₃",
-                "filtrate": "Filtrat menuju Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺)",
+                "action": "Tambahkan (NH₄)₂CO₃ + NH₄OH + NH₄Cl pada filtrat",
+                "result": "BaCO₃, SrCO₃, CaCO₃ terendap putih",
+                "filtrate": "Filtrat → Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺)",
                 "residue": "BaCO₃, SrCO₃, CaCO₃"
             },
             {
-                "action": "Pada endapan: Tambahkan asam asetat (CH₃COOH)",
-                "result": "Semua karbonat larut membentuk asetat",
+                "action": "Tambahkan CH₃COOH (asam asetat) pada endapan",
+                "result": "Semua karbonat larut menjadi asetat",
                 "filtrate": "Ba²⁺, Sr²⁺, Ca²⁺ (sebagai asetat)",
                 "residue": "-"
             },
@@ -183,497 +532,974 @@ cation_data = {
             {
                 "action": "Pada filtrat Ca²⁺: Tambahkan (NH₄)₂C₂O₄",
                 "result": "Endapan putih CaC₂O₄",
-                "confirm": "Ca²⁺ terkonfirmasi"
-            }
-        ]
-    },
-    "Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺)": {
-        "color": "#6BCB77",
-        "reagen": "Tidak ada reagen pengendap spesifik (kation larut/residu)",
-        "precipitate": "Tidak terdapat endapan",
-        "steps": [
-            {
-                "action": "Uji Mg²⁺: Tambahkan NH₄OH + (NH₄)₂HPO₄",
-                "result": "Endapan putih kristalin MgNH₄PO₄·6H₂O (magnesium amonium fosfat/struvit)",
-                "confirm": "Mg²⁺ terkonfirmasi"
-            },
-            {
-                "action": "Uji K⁺: Tambahkan asam tartrat (H₂C₄H₄O₆)",
-                "result": "Endapan putih KHC₄H₄O₆",
-                "confirm": "K⁺ terkonfirmasi"
-            },
-            {
-                "action": "Uji Na⁺: Tambahkan asam asetat uranil Zn(UO₂)₃(CH₃COO)₈",
-                "result": "Kristal kuning NaZn(UO₂)₃(CH₃COO)₉·6H₂O",
-                "confirm": "Na⁺ terkonfirmasi"
-            },
-            {
-                "action": "Uji NH₄⁺: Tambahkan NaOH dan panaskan",
-                "result": "Gas NH₃ yang berbau tajam (merahkan lakmus merah basah)",
-                "confirm": "NH₄⁺ terkonfirmasi"
+                "confirm": "Ca²⁺ terkonfirmasi ✅"
             }
         ]
     }
 }
 
 # ============================================
-# BAGAN INTERAKTIF (SUDAH DIKOREKSI)
+# QUIZ QUESTIONS (BUILT-IN)
 # ============================================
 
-def create_flowchart_nodes():
-    nodes = []
-    edges = []
+quiz_questions = {
+    "Golongan I": [
+        {
+            "question": "Reagen apa yang digunakan untuk mengendapkan kation Golongan I?",
+            "options": ["H₂SO₄ encer", "HCl encer", "NH₄OH", "NaOH"],
+            "correct": 1,
+            "explanation": "HCl encer digunakan karena Ag⁺, Pb²⁺, dan Hg₂²⁺ membentuk garam klorida yang tidak larut."
+        },
+        {
+            "question": "Warna endapan PbCl₂ adalah...",
+            "options": ["Kuning", "Hitam", "Putih", "Merah"],
+            "correct": 2,
+            "explanation": "PbCl₂ membentuk endapan berwarna putih saat bereaksi dengan HCl encer."
+        },
+        {
+            "question": "Bagaimana cara memisahkan Pb²⁺ dari AgCl dan Hg₂Cl₂?",
+            "options": ["Tambahkan NH₄OH", "Panaskan dengan air panas", "Tambahkan HNO₃", "Tambahkan NaOH"],
+            "correct": 1,
+            "explanation": "PbCl₂ larut dalam air panas karena kelarutannya meningkat signifikan dengan suhu, sedangkan AgCl dan Hg₂Cl₂ tetap sebagai endapan."
+        },
+        {
+            "question": "Reagen apa yang digunakan untuk mengkonfirmasi keberadaan Pb²⁺?",
+            "options": ["KSCN", "K₂CrO₄", "NH₄OH", "HNO₃"],
+            "correct": 1,
+            "explanation": "K₂CrO₄ menghasilkan endapan kuning PbCrO₄ yang mengkonfirmasi keberadaan Pb²⁺."
+        },
+        {
+            "question": "Apa yang terjadi pada Hg₂Cl₂ saat ditambahkan NH₄OH?",
+            "options": [
+                "Larut sempurna",
+                "Berubah menjadi endapan kuning",
+                "Terbentuk Hg (hitam) + Hg(NH₂)Cl (putih)",
+                "Tidak bereaksi"
+            ],
+            "correct": 2,
+            "explanation": "Hg₂Cl₂ mengalami disproporsionasi dengan NH₄OH: Hg₂²⁺ → Hg⁰ (hitam) + Hg²⁺ yang membentuk Hg(NH₂)Cl (putih)."
+        },
+        {
+            "question": "Kompleks apa yang terbentuk saat AgCl dilarutkan dalam NH₄OH?",
+            "options": ["Ag(OH)₂⁻", "[Ag(NH₃)₂]⁺", "AgNO₃", "AgCl₂⁻"],
+            "correct": 1,
+            "explanation": "[Ag(NH₃)₂]⁺ adalah kompleks diamminperak(I) yang larut dalam larutan amonia berlebih."
+        },
+        {
+            "question": "Untuk mengkonfirmasi Ag⁺ setelah pembentukan [Ag(NH₃)₂]⁺, reagen apa yang ditambahkan?",
+            "options": ["HCl", "HNO₃", "H₂SO₄", "H₃PO₄"],
+            "correct": 1,
+            "explanation": "Penambahan HNO₃ mengasidifikasi larutan sehingga AgCl mengendap kembali, mengkonfirmasi keberadaan Ag⁺."
+        },
+        {
+            "question": "Warna endapan PbCrO₄ adalah...",
+            "options": ["Putih", "Merah", "Kuning", "Hitam"],
+            "correct": 2,
+            "explanation": "PbCrO₄ adalah endapan berwarna kuning cerah yang merupakan konfirmasi Pb²⁺."
+        },
+        {
+            "question": "Mengapa PbCl₂ dapat dipisahkan dari AgCl menggunakan air panas?",
+            "options": [
+                "PbCl₂ lebih berat",
+                "PbCl₂ memiliki kelarutan yang meningkat dengan suhu",
+                "PbCl₂ bersifat asam",
+                "AgCl tidak stabil"
+            ],
+            "correct": 1,
+            "explanation": "Kelarutan PbCl₂ meningkat signifikan dengan suhu (kelarutan endotermik), sehingga larut dalam air panas sedangkan AgCl tetap tidak larut."
+        },
+        {
+            "question": "Kation mana yang TIDAK termasuk dalam Golongan I analisis kation?",
+            "options": ["Ag⁺", "Pb²⁺", "Ba²⁺", "Hg₂²⁺"],
+            "correct": 2,
+            "explanation": "Ba²⁺ termasuk Golongan IV, bukan Golongan I. Golongan I terdiri dari Ag⁺, Pb²⁺, dan Hg₂²⁺."
+        }
+    ],
+    "Golongan III": [
+        {
+            "question": "Reagen pengendap Golongan III adalah...",
+            "options": ["HCl encer", "(NH₄)₂CO₃", "NH₄OH + NH₄Cl", "NaOH + H₂O₂"],
+            "correct": 2,
+            "explanation": "NH₄OH + NH₄Cl digunakan. NH₄Cl berfungsi sebagai penyangga untuk menekan [OH⁻] agar Mg²⁺ tidak ikut terendap."
+        },
+        {
+            "question": "Warna endapan Fe(OH)₃ adalah...",
+            "options": ["Putih", "Kuning", "Coklat/Merah", "Hitam"],
+            "correct": 2,
+            "explanation": "Fe(OH)₃ membentuk endapan berwarna coklat kemerahan yang khas."
+        },
+        {
+            "question": "Reagen apa yang digunakan untuk mengkonfirmasi Fe³⁺?",
+            "options": ["K₂CrO₄", "KSCN", "NH₄OH", "Pb(NO₃)₂"],
+            "correct": 1,
+            "explanation": "KSCN (kalium tiosianat) menghasilkan warna merah darah [Fe(SCN)]²⁺ yang sangat sensitif untuk Fe³⁺."
+        },
+        {
+            "question": "Fungsi NH₄Cl dalam pengendapan Golongan III adalah...",
+            "options": [
+                "Meningkatkan pH larutan",
+                "Menekan [OH⁻] agar Mg²⁺ tidak terendap",
+                "Mengoksidasi Fe²⁺ menjadi Fe³⁺",
+                "Melarutkan endapan"
+            ],
+            "correct": 1,
+            "explanation": "NH₄Cl berfungsi sebagai buffer/penyangga yang menekan konsentrasi OH⁻ sehingga Mg(OH)₂ tidak terbentuk pada pH tersebut."
+        },
+        {
+            "question": "Bagaimana Al(OH)₃ dapat dibedakan dari Fe(OH)₃?",
+            "options": [
+                "Al(OH)₃ berwarna merah",
+                "Al(OH)₃ larut dalam NaOH berlebih",
+                "Al(OH)₃ mengendap dalam HCl",
+                "Al(OH)₃ bereaksi dengan KSCN"
+            ],
+            "correct": 1,
+            "explanation": "Al(OH)₃ bersifat amfoter sehingga larut dalam NaOH berlebih membentuk [Al(OH)₄]⁻, sedangkan Fe(OH)₃ tidak larut dalam basa berlebih."
+        },
+        {
+            "question": "Cr³⁺ dioksidasi menjadi CrO₄²⁻ menggunakan...",
+            "options": ["HCl", "H₂O₂ + NaOH berlebih", "NH₄OH", "H₂SO₄"],
+            "correct": 1,
+            "explanation": "H₂O₂ dalam suasana basa (NaOH berlebih) mengoksidasi Cr³⁺ dari Cr(OH)₃ menjadi CrO₄²⁻ (kromat) yang larut."
+        },
+        {
+            "question": "Warna larutan [Fe(SCN)]²⁺ adalah...",
+            "options": ["Kuning", "Biru", "Merah Darah", "Hijau"],
+            "correct": 2,
+            "explanation": "[Fe(SCN)]²⁺ menghasilkan warna merah darah yang intens, sangat sensitif bahkan pada konsentrasi rendah."
+        },
+        {
+            "question": "Untuk mengkonfirmasi Cr³⁺, filtrat CrO₄²⁻ ditambahkan...",
+            "options": ["KSCN", "K₂CrO₄", "Pb(NO₃)₂", "NH₄OH"],
+            "correct": 2,
+            "explanation": "Pb(NO₃)₂ bereaksi dengan CrO₄²⁻ membentuk endapan kuning PbCrO₄ yang mengkonfirmasi Cr³⁺."
+        },
+        {
+            "question": "Al(OH)₃ dikonfirmasi dengan cara...",
+            "options": [
+                "Menambahkan KSCN",
+                "Menambahkan HCl perlahan pada filtrat [Al(OH)₄]⁻",
+                "Memanaskan dengan NaOH",
+                "Menambahkan K₂CrO₄"
+            ],
+            "correct": 1,
+            "explanation": "Penambahan HCl perlahan pada [Al(OH)₄]⁻ akan mengendapkan kembali Al(OH)₃ (putih/gel) ketika pH turun ke titik isoelektrik."
+        },
+        {
+            "question": "Kation mana yang TIDAK termasuk Golongan III?",
+            "options": ["Fe³⁺", "Al³⁺", "Cr³⁺", "Ca²⁺"],
+            "correct": 3,
+            "explanation": "Ca²⁺ termasuk Golongan IV, bukan Golongan III. Golongan III terdiri dari Fe³⁺, Al³⁺, dan Cr³⁺."
+        }
+    ],
+    "Golongan IV": [
+        {
+            "question": "Reagen pengendap Golongan IV adalah...",
+            "options": ["HCl encer", "NH₄OH + NH₄Cl", "(NH₄)₂CO₃ + NH₄OH + NH₄Cl", "NaOH"],
+            "correct": 2,
+            "explanation": "(NH₄)₂CO₃ mengendapkan Ba²⁺, Sr²⁺, Ca²⁺ sebagai karbonat. NH₄OH + NH₄Cl mencegah MgCO₃ ikut terendap."
+        },
+        {
+            "question": "Semua karbonat Golongan IV (BaCO₃, SrCO₃, CaCO₃) dilarutkan dengan...",
+            "options": ["HCl pekat", "NaOH", "CH₃COOH (asam asetat)", "H₂SO₄"],
+            "correct": 2,
+            "explanation": "Asam asetat (CH₃COOH) digunakan untuk melarutkan karbonat menjadi asetat yang larut, tanpa memasukkan anion pengganggu seperti Cl⁻ atau SO₄²⁻."
+        },
+        {
+            "question": "Bagaimana Ba²⁺ dipisahkan dari Sr²⁺ dan Ca²⁺?",
+            "options": [
+                "Dengan menambahkan NH₄OH",
+                "Dengan menambahkan K₂CrO₄ pada larutan asetat",
+                "Dengan pemanasan",
+                "Dengan menambahkan NaOH"
+            ],
+            "correct": 1,
+            "explanation": "K₂CrO₄ mengendapkan Ba²⁺ sebagai BaCrO₄ (kuning) di pH netral, sedangkan SrCrO₄ dan CaCrO₄ lebih larut pada kondisi ini."
+        },
+        {
+            "question": "Warna endapan BaCrO₄ adalah...",
+            "options": ["Putih", "Kuning", "Merah", "Hitam"],
+            "correct": 1,
+            "explanation": "BaCrO₄ adalah endapan berwarna kuning yang mengkonfirmasi keberadaan Ba²⁺."
+        },
+        {
+            "question": "Reagen apa yang digunakan untuk memisahkan Sr²⁺ dari Ca²⁺?",
+            "options": ["K₂CrO₄", "(NH₄)₂CO₃", "(NH₄)₂SO₄", "(NH₄)₂C₂O₄"],
+            "correct": 2,
+            "explanation": "(NH₄)₂SO₄ mengendapkan SrSO₄ (putih) sedangkan CaSO₄ lebih larut, sehingga Ca²⁺ tetap dalam larutan."
+        },
+        {
+            "question": "Cara mengkonfirmasi Ca²⁺ adalah dengan menambahkan...",
+            "options": ["K₂CrO₄", "(NH₄)₂SO₄", "(NH₄)₂C₂O₄", "KSCN"],
+            "correct": 2,
+            "explanation": "(NH₄)₂C₂O₄ (ammonium oksalat) mengendapkan Ca²⁺ sebagai CaC₂O₄ (putih) yang mengkonfirmasi keberadaan Ca²⁺."
+        },
+        {
+            "question": "Mengapa NH₄Cl ditambahkan dalam pengendapan Golongan IV?",
+            "options": [
+                "Mengoksidasi kation",
+                "Mencegah pengendapan MgCO₃",
+                "Melarutkan endapan",
+                "Menaikkan pH"
+            ],
+            "correct": 1,
+            "explanation": "NH₄Cl menekan konsentrasi CO₃²⁻ melalui efek ion bersama pada NH₃/NH₄⁺, sehingga MgCO₃ tidak terendap karena Ksp-nya lebih besar dari hasil kali ion."
+        },
+        {
+            "question": "Warna endapan SrSO₄ adalah...",
+            "options": ["Kuning", "Merah", "Putih", "Abu-abu"],
+            "correct": 2,
+            "explanation": "SrSO₄ membentuk endapan berwarna putih saat Sr²⁺ bereaksi dengan SO₄²⁻."
+        },
+        {
+            "question": "Kation mana yang TIDAK termasuk Golongan IV?",
+            "options": ["Ba²⁺", "Sr²⁺", "Ca²⁺", "Fe³⁺"],
+            "correct": 3,
+            "explanation": "Fe³⁺ termasuk Golongan III, bukan Golongan IV. Golongan IV terdiri dari Ba²⁺, Sr²⁺, dan Ca²⁺."
+        },
+        {
+            "question": "Warna endapan CaC₂O₄ adalah...",
+            "options": ["Kuning", "Putih", "Merah", "Biru"],
+            "correct": 1,
+            "explanation": "CaC₂O₄ (kalsium oksalat) membentuk endapan putih yang mengkonfirmasi Ca²⁺."
+        }
+    ]
+}
 
-    # Level 0 - Sample
-    nodes.append(Node(id="sample", label="Sampel\n(Ag⁺, Pb²⁺, Hg₂²⁺,\nFe³⁺, Al³⁺, Cr³⁺,\nBa²⁺, Sr²⁺, Ca²⁺,\nMg²⁺, K⁺, Na⁺, NH₄⁺)", 
-                     color="#9C27B0", size=35, shape="box"))
+def get_random_questions(group, n=10):
+    questions = quiz_questions.get(group, [])
+    if len(questions) <= n:
+        return random.sample(questions, len(questions))
+    return random.sample(questions, n)
 
-    # ============ GOLONGAN I ============
-    nodes.append(Node(id="hcl", label="+ HCl encer", color="#FF9800", size=25))
-    nodes.append(Node(id="group1", label="Endapan Putih\nAgCl, PbCl₂, Hg₂Cl₂\nGOLONGAN I", 
-                     color="#FF6B6B", size=30, shape="box"))
-    nodes.append(Node(id="filtrat1", label="Filtrat G-II\n(Cu²⁺, Cd²⁺, Bi³⁺,\nHg²⁺, Sn²⁺, Sb³⁺, As³⁺)\nDILEWATI →", 
-                     color="#BDBDBD", size=25, shape="box"))
+# ============================================
+# DIGITALISASI KIMIA - LOGIC
+# ============================================
 
-    edges.append(Edge(source="sample", target="hcl", color="#666"))
-    edges.append(Edge(source="hcl", target="group1", color="#666"))
-    edges.append(Edge(source="hcl", target="filtrat1", color="#999", dashes=True))
+CATION_PROFILES = {
+    "Ag⁺": {
+        "group": "I",
+        "reactions": [
+            "Ag⁺ + Cl⁻ → AgCl↓ (Putih)",
+            "AgCl + 2NH₃ → [Ag(NH₃)₂]⁺ + Cl⁻",
+            "[Ag(NH₃)₂]⁺ + 2H⁺ + Cl⁻ → AgCl↓ (Putih) + 2NH₄⁺"
+        ],
+        "confirmasi": "Endapan putih AgCl → larut dalam NH₄OH → endapan putih kembali dengan HNO₃",
+        "warna_endapan": "Putih",
+        "icon": "🥈"
+    },
+    "Pb²⁺": {
+        "group": "I",
+        "reactions": [
+            "Pb²⁺ + 2Cl⁻ → PbCl₂↓ (Putih)",
+            "PbCl₂ → Pb²⁺ + 2Cl⁻  (larut dalam H₂O panas)",
+            "Pb²⁺ + CrO₄²⁻ → PbCrO₄↓ (Kuning)"
+        ],
+        "confirmasi": "Endapan kuning PbCrO₄ setelah penambahan K₂CrO₄",
+        "warna_endapan": "Kuning",
+        "icon": "🟡"
+    },
+    "Hg₂²⁺": {
+        "group": "I",
+        "reactions": [
+            "Hg₂²⁺ + 2Cl⁻ → Hg₂Cl₂↓ (Putih)",
+            "Hg₂Cl₂ + 2NH₃ → Hg↓ (Hitam) + Hg(NH₂)Cl↓ (Putih) + NH₄⁺ + Cl⁻"
+        ],
+        "confirmasi": "Endapan hitam Hg dan putih Hg(NH₂)Cl saat ditambahkan NH₄OH",
+        "warna_endapan": "Hitam + Putih",
+        "icon": "⚫"
+    },
+    "Fe³⁺": {
+        "group": "III",
+        "reactions": [
+            "Fe³⁺ + 3OH⁻ → Fe(OH)₃↓ (Coklat)",
+            "Fe(OH)₃ + 3HCl → FeCl₃ + 3H₂O",
+            "Fe³⁺ + SCN⁻ → [Fe(SCN)]²⁺ (Merah Darah)"
+        ],
+        "confirmasi": "Warna merah darah [Fe(SCN)]²⁺ dengan KSCN",
+        "warna_endapan": "Coklat/Merah",
+        "icon": "🟤"
+    },
+    "Al³⁺": {
+        "group": "III",
+        "reactions": [
+            "Al³⁺ + 3OH⁻ → Al(OH)₃↓ (Putih/Gel)",
+            "Al(OH)₃ + OH⁻ → [Al(OH)₄]⁻  (larut dalam NaOH berlebih)",
+            "[Al(OH)₄]⁻ + H⁺ → Al(OH)₃↓ (Putih)"
+        ],
+        "confirmasi": "Endapan putih/gel Al(OH)₃ yang larut dalam NaOH berlebih dan mengendap kembali dengan asam",
+        "warna_endapan": "Putih/Gel",
+        "icon": "⚪"
+    },
+    "Cr³⁺": {
+        "group": "III",
+        "reactions": [
+            "Cr³⁺ + 3OH⁻ → Cr(OH)₃↓ (Abu-abu/Hijau)",
+            "2Cr(OH)₃ + 3H₂O₂ + 4OH⁻ → 2CrO₄²⁻ + 8H₂O",
+            "Pb²⁺ + CrO₄²⁻ → PbCrO₄↓ (Kuning)"
+        ],
+        "confirmasi": "Endapan kuning PbCrO₄ setelah oksidasi Cr(OH)₃ dengan H₂O₂/NaOH",
+        "warna_endapan": "Abu-abu/Hijau → Kuning (PbCrO₄)",
+        "icon": "🟢"
+    },
+    "Ba²⁺": {
+        "group": "IV",
+        "reactions": [
+            "Ba²⁺ + CO₃²⁻ → BaCO₃↓ (Putih)",
+            "BaCO₃ + 2CH₃COOH → Ba²⁺ + 2CH₃COO⁻ + H₂O + CO₂",
+            "Ba²⁺ + CrO₄²⁻ → BaCrO₄↓ (Kuning)"
+        ],
+        "confirmasi": "Endapan kuning BaCrO₄ dengan K₂CrO₄ pada suasana netral/asetat",
+        "warna_endapan": "Kuning",
+        "icon": "🟨"
+    },
+    "Sr²⁺": {
+        "group": "IV",
+        "reactions": [
+            "Sr²⁺ + CO₃²⁻ → SrCO₃↓ (Putih)",
+            "SrCO₃ + 2CH₃COOH → Sr²⁺ + 2CH₃COO⁻ + H₂O + CO₂",
+            "Sr²⁺ + SO₄²⁻ → SrSO₄↓ (Putih)"
+        ],
+        "confirmasi": "Endapan putih SrSO₄ dengan (NH₄)₂SO₄",
+        "warna_endapan": "Putih",
+        "icon": "🔲"
+    },
+    "Ca²⁺": {
+        "group": "IV",
+        "reactions": [
+            "Ca²⁺ + CO₃²⁻ → CaCO₃↓ (Putih)",
+            "CaCO₃ + 2CH₃COOH → Ca²⁺ + 2CH₃COO⁻ + H₂O + CO₂",
+            "Ca²⁺ + C₂O₄²⁻ → CaC₂O₄↓ (Putih)"
+        ],
+        "confirmasi": "Endapan putih CaC₂O₄ dengan (NH₄)₂C₂O₄",
+        "warna_endapan": "Putih",
+        "icon": "⬜"
+    }
+}
 
-    # Group I branches
-    nodes.append(Node(id="hot_water", label="+ H₂O panas", color="#FF9800", size=25))
-    nodes.append(Node(id="pb", label="Pb²⁺\n(larut)", color="#FFD93D", size=25, shape="box"))
-    nodes.append(Node(id="ag_hg", label="AgCl, Hg₂Cl₂\n(tidak larut)", 
-                     color="#FF6B6B", size=25, shape="box"))
+# Decision tree questions
+DIG_QUESTIONS = [
+    {
+        "id": "q1",
+        "text": "Apakah terbentuk endapan putih saat sampel ditambahkan HCl encer?",
+        "yes": "q2",
+        "no": "q_g3_start",
+        "hint": "Kation Golongan I (Ag⁺, Pb²⁺, Hg₂²⁺) membentuk garam klorida tidak larut."
+    },
+    {
+        "id": "q2",
+        "text": "Apakah sebagian endapan larut saat dipanaskan dengan air panas?",
+        "yes": "q3",
+        "no": "q4",
+        "hint": "PbCl₂ larut dalam air panas karena kelarutannya meningkat dengan suhu."
+    },
+    {
+        "id": "q3",
+        "text": "Apakah filtrat (air panas) membentuk endapan kuning saat ditambahkan K₂CrO₄?",
+        "yes": "confirm_Pb",
+        "no": "q4",
+        "hint": "PbCrO₄ berwarna kuning — tanda khas Pb²⁺."
+    },
+    {
+        "id": "q4",
+        "text": "Apakah endapan yang tidak larut dalam air panas berubah menjadi hitam saat ditambahkan NH₄OH?",
+        "yes": "confirm_Hg",
+        "no": "q5",
+        "hint": "Hg₂Cl₂ mengalami disproporsionasi dengan NH₄OH: Hg⁰ (hitam) + Hg(NH₂)Cl (putih)."
+    },
+    {
+        "id": "q5",
+        "text": "Apakah endapan larut dalam NH₄OH dan terbentuk endapan putih kembali saat ditambahkan HNO₃?",
+        "yes": "confirm_Ag",
+        "no": "q_g3_start",
+        "hint": "AgCl larut dalam NH₄OH membentuk [Ag(NH₃)₂]⁺, lalu mengendap kembali dengan asam."
+    },
+    {
+        "id": "q_g3_start",
+        "text": "Apakah terbentuk endapan (coklat/putih/abu-abu) saat sampel ditambahkan NH₄OH + NH₄Cl?",
+        "yes": "q_g3_1",
+        "no": "q_g4_start",
+        "hint": "Fe(OH)₃ (coklat), Al(OH)₃ (putih), Cr(OH)₃ (abu-abu/hijau) menandakan Golongan III."
+    },
+    {
+        "id": "q_g3_1",
+        "text": "Apakah terbentuk warna merah darah saat endapan dilarutkan HCl lalu ditambahkan KSCN?",
+        "yes": "confirm_Fe",
+        "no": "q_g3_2",
+        "hint": "[Fe(SCN)]²⁺ berwarna merah darah — sangat sensitif untuk Fe³⁺."
+    },
+    {
+        "id": "q_g3_2",
+        "text": "Apakah endapan larut dalam NaOH berlebih + H₂O₂ dan terbentuk endapan putih/gel saat filtrat diasamkan?",
+        "yes": "confirm_Al",
+        "no": "q_g3_3",
+        "hint": "Al(OH)₃ bersifat amfoter — larut dalam basa berlebih → [Al(OH)₄]⁻, mengendap kembali saat diasamkan."
+    },
+    {
+        "id": "q_g3_3",
+        "text": "Apakah filtrat berwarna kuning/jingga (CrO₄²⁻) dan membentuk endapan kuning dengan Pb(NO₃)₂?",
+        "yes": "confirm_Cr",
+        "no": "q_g4_start",
+        "hint": "CrO₄²⁻ berwarna kuning dan membentuk PbCrO₄ (kuning) dengan Pb(NO₃)₂."
+    },
+    {
+        "id": "q_g4_start",
+        "text": "Apakah terbentuk endapan putih saat sampel ditambahkan (NH₄)₂CO₃ + NH₄OH + NH₄Cl?",
+        "yes": "q_g4_1",
+        "no": "no_match",
+        "hint": "BaCO₃, SrCO₃, CaCO₃ semuanya berwarna putih — khas Golongan IV."
+    },
+    {
+        "id": "q_g4_1",
+        "text": "Setelah dilarutkan dengan CH₃COOH, apakah terbentuk endapan kuning dengan K₂CrO₄?",
+        "yes": "confirm_Ba",
+        "no": "q_g4_2",
+        "hint": "BaCrO₄ berwarna kuning — mengkonfirmasi Ba²⁺."
+    },
+    {
+        "id": "q_g4_2",
+        "text": "Apakah terbentuk endapan putih dengan (NH₄)₂SO₄?",
+        "yes": "confirm_Sr",
+        "no": "q_g4_3",
+        "hint": "SrSO₄ berwarna putih — mengkonfirmasi Sr²⁺."
+    },
+    {
+        "id": "q_g4_3",
+        "text": "Apakah terbentuk endapan putih dengan (NH₄)₂C₂O₄?",
+        "yes": "confirm_Ca",
+        "no": "no_match",
+        "hint": "CaC₂O₄ (putih) mengkonfirmasi Ca²⁺."
+    }
+]
 
-    edges.append(Edge(source="group1", target="hot_water", color="#666"))
-    edges.append(Edge(source="hot_water", target="pb", color="#666"))
-    edges.append(Edge(source="hot_water", target="ag_hg", color="#666"))
+DIG_Q_MAP = {q["id"]: q for q in DIG_QUESTIONS}
 
-    # Pb confirmation
-    nodes.append(Node(id="k2cro4", label="+ K₂CrO₄", color="#FF9800", size=25))
-    nodes.append(Node(id="pbcro4", label="PbCrO₄\n(Kuning)", color="#FFD93D", size=25, shape="box"))
-    edges.append(Edge(source="pb", target="k2cro4", color="#666"))
-    edges.append(Edge(source="k2cro4", target="pbcro4", color="#666"))
+def render_digitalisasi():
+    dm = st.session_state.dark_mode
+    accent = "#5c7cfa" if dm else "#3a5bd9"
+    text   = "#e8eaf6" if dm else "#1a1a2e"
+    card   = "#1e2130" if dm else "#ffffff"
+    border = "#2d3561" if dm else "#d0d9f0"
+    green  = "#56cf86" if dm else "#1a9e56"
+    yellow = "#ffd93d" if dm else "#b8860b"
+    red    = "#ff6b6b" if dm else "#d32f2f"
 
-    # Ag/Hg branch
-    nodes.append(Node(id="nh4oh_g1", label="+ NH₄OH", color="#FF9800", size=25))
-    nodes.append(Node(id="ag_complex", label="[Ag(NH₃)₂]⁺\n(larut)", color="#C8E6C9", size=25, shape="box"))
-    nodes.append(Node(id="hg_mix", label="Hg + Hg(NH₂)Cl\n(Hitam + Putih)", 
-                     color="#757575", size=25, shape="box"))
+    st.markdown(f"""
+    <div style="background:linear-gradient(135deg,{'#1a1d27' if dm else '#dde8ff'} 0%,{'#0f1117' if dm else '#f4f6fb'} 100%);
+        border:2px solid {border}; border-radius:20px; padding:2rem; margin-bottom:1.5rem;">
+        <h1 style="color:{accent};font-family:'Playfair Display',serif;font-size:2rem;margin:0 0 0.4rem 0;">
+            🔍 Digitalisasi Analisis Kation
+        </h1>
+        <p style="color:{text};opacity:0.7;margin:0;">
+            Jawab serangkaian pertanyaan berdasarkan observasi lab untuk mengidentifikasi kation yang ada dalam sampel Anda.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    edges.append(Edge(source="ag_hg", target="nh4oh_g1", color="#666"))
-    edges.append(Edge(source="nh4oh_g1", target="ag_complex", color="#666"))
-    edges.append(Edge(source="nh4oh_g1", target="hg_mix", color="#666"))
+    # Init state
+    if "dig_current" not in st.session_state:
+        st.session_state.dig_current = "q1"
+        st.session_state.dig_history = []
+        st.session_state.dig_result  = None
 
-    # Ag confirmation
-    nodes.append(Node(id="hno3", label="+ HNO₃", color="#FF9800", size=25))
-    nodes.append(Node(id="agcl_back", label="AgCl\n(Putih)", color="#E0E0E0", size=25, shape="box"))
-    edges.append(Edge(source="ag_complex", target="hno3", color="#666"))
-    edges.append(Edge(source="hno3", target="agcl_back", color="#666"))
+    # Reset button
+    col_r, col_s = st.columns([8, 2])
+    with col_s:
+        if st.button("🔄 Reset", use_container_width=True):
+            st.session_state.dig_current = "q1"
+            st.session_state.dig_history = []
+            st.session_state.dig_result  = None
+            st.rerun()
 
-    # ============ SKIP GOLONGAN II ============
-    nodes.append(Node(id="skip_g2_note", label="Golongan II\ndilewati\ndalam analisis ini", 
-                     color="#EEEEEE", size=20, shape="ellipse"))
+    # History path
+    if st.session_state.dig_history:
+        path_text = " → ".join([
+            f"{'✅' if a else '❌'} {DIG_Q_MAP[q]['text'][:40]}..." 
+            for q, a in st.session_state.dig_history
+        ])
+        st.markdown(f"""
+        <div style="background:{'rgba(92,124,250,0.1)' if dm else 'rgba(58,91,217,0.06)'};
+            border:1px solid {border}; border-radius:12px; padding:0.8rem 1rem;
+            margin-bottom:1rem; font-size:0.8rem; color:{text}; opacity:0.8; line-height:1.8;">
+            <strong>Jejak Analisis:</strong><br>{path_text}
+        </div>
+        """, unsafe_allow_html=True)
 
-    edges.append(Edge(source="filtrat1", target="skip_g2_note", color="#BDBDBD", dashes=True))
+    # Show result
+    if st.session_state.dig_result:
+        result_key = st.session_state.dig_result
 
-    # ============ GOLONGAN III ============
-    nodes.append(Node(id="nh4oh_g3", label="+ NH₄OH + NH₄Cl\n(penyangga)", color="#FF9800", size=25))
-    nodes.append(Node(id="group3", label="Endapan\nFe(OH)₃ (Coklat)\nAl(OH)₃ (Putih)\nCr(OH)₃ (Abu²)\nGOLONGAN III", 
-                     color="#4ECDC4", size=30, shape="box"))
-    nodes.append(Node(id="filtrat3", label="Filtrat G-IV\n(Ba²⁺, Sr²⁺, Ca²⁺,\nMg²⁺, K⁺, Na⁺, NH₄⁺)", 
-                     color="#E0E0E0", size=25, shape="box"))
+        if result_key == "no_match":
+            st.markdown(f"""
+            <div style="background:{'rgba(255,107,107,0.15)' if dm else 'rgba(211,47,47,0.08)'};
+                border:2px solid {red}; border-radius:16px; padding:2rem; text-align:center;">
+                <h2 style="color:{red};">⚠️ Kation Tidak Teridentifikasi</h2>
+                <p style="color:{text};">Berdasarkan jawaban Anda, kation tidak dapat diidentifikasi dalam Golongan I, III, atau IV.<br>
+                Kemungkinan sampel mengandung kation Golongan II atau V, atau terdapat kesalahan prosedur.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
 
-    edges.append(Edge(source="skip_g2_note", target="nh4oh_g3", color="#BDBDBD", dashes=True))
-    edges.append(Edge(source="nh4oh_g3", target="group3", color="#666"))
-    edges.append(Edge(source="nh4oh_g3", target="filtrat3", color="#666", dashes=True))
+        ion_key = result_key.replace("confirm_", "")
+        # Map key to actual ion symbol
+        ion_map = {
+            "Pb": "Pb²⁺", "Ag": "Ag⁺", "Hg": "Hg₂²⁺",
+            "Fe": "Fe³⁺", "Al": "Al³⁺", "Cr": "Cr³⁺",
+            "Ba": "Ba²⁺", "Sr": "Sr²⁺", "Ca": "Ca²⁺"
+        }
+        ion = ion_map.get(ion_key, ion_key)
+        profile = CATION_PROFILES.get(ion, {})
+        grp = profile.get("group", "?")
+        grp_colors = {"I": red, "III": "#4ecdc4" if dm else "#00796b", "IV": yellow}
+        gc = grp_colors.get(grp, accent)
 
-    # Group III branches
-    nodes.append(Node(id="naoh_h2o2", label="+ NaOH berlebih\n+ H₂O₂", color="#FF9800", size=25))
-    nodes.append(Node(id="fe_oh", label="Fe(OH)₃\n(tidak larut)", color="#8D6E63", size=25, shape="box"))
-    nodes.append(Node(id="al_cr_sol", label="[Al(OH)₄]⁻\nCrO₄²⁻\n(larut)", color="#C8E6C9", size=25, shape="box"))
+        st.markdown(f"""
+        <div style="background:{card}; border:2px solid {gc};
+            border-radius:20px; padding:2rem; margin:1rem 0; text-align:center;">
+            <div style="font-size:3.5rem;">{profile.get('icon','⚗️')}</div>
+            <h2 style="color:{gc}; font-family:'Playfair Display',serif; font-size:2.2rem; margin:0.5rem 0;">
+                {ion}
+            </h2>
+            <div style="display:inline-block; background:{gc}20; border:1px solid {gc};
+                border-radius:20px; padding:4px 18px; margin-bottom:1rem;">
+                <span style="color:{gc}; font-weight:600; font-size:0.9rem;">Golongan {grp}</span>
+            </div>
+            <p style="color:{text}; margin:0;">
+                <strong>Warna Endapan:</strong> {profile.get('warna_endapan','—')}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    edges.append(Edge(source="group3", target="naoh_h2o2", color="#666"))
-    edges.append(Edge(source="naoh_h2o2", target="fe_oh", color="#666"))
-    edges.append(Edge(source="naoh_h2o2", target="al_cr_sol", color="#666"))
+        st.markdown(f"### ⚗️ Reaksi Kimia yang Terjadi")
+        for rxn in profile.get("reactions", []):
+            st.markdown(f"""
+            <div style="background:{'rgba(92,124,250,0.08)' if dm else 'rgba(58,91,217,0.05)'};
+                border-left:4px solid {accent}; border-radius:8px;
+                padding:0.8rem 1.2rem; margin:0.4rem 0;
+                font-family:'JetBrains Mono',monospace; font-size:0.92rem; color:{text};">
+                {rxn}
+            </div>
+            """, unsafe_allow_html=True)
 
-    # Fe confirmation
-    nodes.append(Node(id="kscn", label="+ KSCN", color="#FF9800", size=25))
-    nodes.append(Node(id="fe_red", label="[Fe(SCN)]²⁺\n(Merah Darah)", color="#F44336", size=25, shape="box"))
-    edges.append(Edge(source="fe_oh", target="kscn", color="#666"))
-    edges.append(Edge(source="kscn", target="fe_red", color="#666"))
+        st.markdown(f"""
+        <div style="background:{'rgba(86,207,134,0.12)' if dm else 'rgba(26,158,86,0.08)'};
+            border:1.5px solid {green}; border-radius:12px;
+            padding:1rem 1.2rem; margin-top:1rem; color:{text};">
+            <strong style="color:{green};">✅ Konfirmasi:</strong> {profile.get('confirmasi','—')}
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Al confirmation
-    nodes.append(Node(id="hcl_slow", label="+ HCl perlahan", color="#FF9800", size=25))
-    nodes.append(Node(id="al_oh_back", label="Al(OH)₃\n(Putih/Gel)", color="#E0E0E0", size=25, shape="box"))
-    edges.append(Edge(source="al_cr_sol", target="hcl_slow", color="#666"))
-    edges.append(Edge(source="hcl_slow", target="al_oh_back", color="#666"))
+        # Prosedur lengkap
+        grp_full = {"I": "Golongan I", "III": "Golongan III", "IV": "Golongan IV"}.get(grp, "")
+        if grp_full in cation_data:
+            with st.expander("📋 Lihat Prosedur Analisis Lengkap Golongan " + grp):
+                for i, step in enumerate(cation_data[grp_full]["steps"], 1):
+                    st.markdown(f"""
+                    <div style="display:flex; align-items:flex-start; gap:10px; margin:8px 0;">
+                        <div style="background:{accent}; color:#fff; width:26px; height:26px;
+                            border-radius:50%; display:flex; align-items:center; justify-content:center;
+                            font-size:0.78rem; font-weight:700; flex-shrink:0;">{i}</div>
+                        <div style="background:{'rgba(92,124,250,0.08)' if dm else '#f0f4ff'};
+                            border-radius:10px; padding:0.7rem 1rem; flex:1; color:{text};">
+                            <strong>{step['action']}</strong><br>
+                            <span style="opacity:0.85;">{step['result']}</span>
+                            {f"<br><span style='color:{green};'>✅ {step['confirm']}</span>" if 'confirm' in step else ''}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+        return
 
-    # Cr confirmation
-    nodes.append(Node(id="pb_no3", label="+ Pb(NO₃)₂", color="#FF9800", size=25))
-    nodes.append(Node(id="cr_yellow", label="PbCrO₄\n(Kuning)", color="#FFD93D", size=25, shape="box"))
-    edges.append(Edge(source="al_cr_sol", target="pb_no3", color="#666", dashes=True))
-    edges.append(Edge(source="pb_no3", target="cr_yellow", color="#666", dashes=True))
+    # Current question
+    curr_id = st.session_state.dig_current
+    if curr_id not in DIG_Q_MAP:
+        return
 
-    # ============ GOLONGAN IV ============
-    nodes.append(Node(id="nh4co3", label="+ (NH₄)₂CO₃\n+ NH₄OH + NH₄Cl", color="#FF9800", size=25))
-    nodes.append(Node(id="group4", label="Endapan Putih\nBaCO₃, SrCO₃, CaCO₃\nGOLONGAN IV", 
-                     color="#FFD93D", size=30, shape="box"))
-    nodes.append(Node(id="filtrat4", label="Filtrat G-V\n(Mg²⁺, K⁺, Na⁺, NH₄⁺)", 
-                     color="#E0E0E0", size=25, shape="box"))
+    q = DIG_Q_MAP[curr_id]
+    total_q = len(DIG_QUESTIONS)
+    answered = len(st.session_state.dig_history)
+    progress = answered / total_q
 
-    edges.append(Edge(source="filtrat3", target="nh4co3", color="#666"))
-    edges.append(Edge(source="nh4co3", target="group4", color="#666"))
-    edges.append(Edge(source="nh4co3", target="filtrat4", color="#666", dashes=True))
+    st.progress(progress)
+    st.markdown(f"<p style='color:{text};opacity:0.6;font-size:0.85rem;'>Pertanyaan {answered+1} dari ~{total_q}</p>", unsafe_allow_html=True)
 
-    # Group IV branches
-    nodes.append(Node(id="acetic", label="+ CH₃COOH", color="#FF9800", size=25))
-    nodes.append(Node(id="acetates", label="Ba²⁺, Sr²⁺, Ca²⁺\n(sebagai asetat)", color="#FFF9C4", size=25, shape="box"))
-    edges.append(Edge(source="group4", target="acetic", color="#666"))
-    edges.append(Edge(source="acetic", target="acetates", color="#666"))
+    st.markdown(f"""
+    <div style="background:{card}; border:2px solid {accent};
+        border-radius:16px; padding:1.5rem 2rem; margin:1rem 0;">
+        <p style="color:{accent}; font-size:0.82rem; font-weight:600; margin:0 0 0.5rem 0; text-transform:uppercase; letter-spacing:1px;">
+            OBSERVASI LAB
+        </p>
+        <h3 style="color:{text}; font-size:1.2rem; margin:0 0 1rem 0;">{q['text']}</h3>
+        <div style="background:{'rgba(255,140,66,0.12)' if dm else 'rgba(224,92,0,0.07)'};
+            border-left:3px solid {'#ff8c42' if dm else '#e05c00'};
+            border-radius:6px; padding:0.6rem 1rem; font-size:0.85rem; color:{text}; opacity:0.85;">
+            💡 <em>{q['hint']}</em>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Ba separation
-    nodes.append(Node(id="k2cro4_g4", label="+ K₂CrO₄", color="#FF9800", size=25))
-    nodes.append(Node(id="ba_cro4", label="BaCrO₄\n(Kuning)", color="#FFD93D", size=25, shape="box"))
-    nodes.append(Node(id="sr_ca", label="Sr²⁺, Ca²⁺\n(larut)", color="#4ECDC4", size=25, shape="box"))
-
-    edges.append(Edge(source="acetates", target="k2cro4_g4", color="#666"))
-    edges.append(Edge(source="k2cro4_g4", target="ba_cro4", color="#666"))
-    edges.append(Edge(source="k2cro4_g4", target="sr_ca", color="#666"))
-
-    # Sr separation
-    nodes.append(Node(id="ammonium_sulfate", label="+ (NH₄)₂SO₄", color="#FF9800", size=25))
-    nodes.append(Node(id="sr_so4", label="SrSO₄\n(Putih)", color="#E0E0E0", size=25, shape="box"))
-    nodes.append(Node(id="ca_only", label="Ca²⁺\n(larut)", color="#4ECDC4", size=25, shape="box"))
-
-    edges.append(Edge(source="sr_ca", target="ammonium_sulfate", color="#666"))
-    edges.append(Edge(source="ammonium_sulfate", target="sr_so4", color="#666"))
-    edges.append(Edge(source="ammonium_sulfate", target="ca_only", color="#666"))
-
-    # Ca confirmation
-    nodes.append(Node(id="oxalate", label="+ (NH₄)₂C₂O₄", color="#FF9800", size=25))
-    nodes.append(Node(id="ca_ox", label="CaC₂O₄\n(Putih)", color="#E0E0E0", size=25, shape="box"))
-    edges.append(Edge(source="ca_only", target="oxalate", color="#666"))
-    edges.append(Edge(source="oxalate", target="ca_ox", color="#666"))
-
-    # ============ GOLONGAN V ============
-    nodes.append(Node(id="group5", label="GOLONGAN V\nMg²⁺, K⁺, Na⁺, NH₄⁺\n(Kation Residu)", 
-                     color="#6BCB77", size=30, shape="box"))
-
-    edges.append(Edge(source="filtrat4", target="group5", color="#666"))
-
-    # Group V tests
-    nodes.append(Node(id="mg_test", label="Mg²⁺: + NH₄OH\n+ (NH₄)₂HPO₄", color="#FF9800", size=25))
-    nodes.append(Node(id="mg_precip", label="MgNH₄PO₄·6H₂O\n(Putih)", color="#E0E0E0", size=25, shape="box"))
-    edges.append(Edge(source="group5", target="mg_test", color="#666"))
-    edges.append(Edge(source="mg_test", target="mg_precip", color="#666"))
-
-    nodes.append(Node(id="k_test", label="K⁺: + H₂C₄H₄O₆\n(asam tartrat)", color="#FF9800", size=25))
-    nodes.append(Node(id="k_precip", label="KHC₄H₄O₆\n(Putih)", color="#E0E0E0", size=25, shape="box"))
-    edges.append(Edge(source="group5", target="k_test", color="#666", dashes=True))
-    edges.append(Edge(source="k_test", target="k_precip", color="#666", dashes=True))
-
-    nodes.append(Node(id="na_test", label="Na⁺: + Zn(UO₂)₃\n(CH₃COO)₈", color="#FF9800", size=25))
-    nodes.append(Node(id="na_precip", label="Kristal Kuning\nNaZn(UO₂)₃(CH₃COO)₉", color="#FFD93D", size=25, shape="box"))
-    edges.append(Edge(source="group5", target="na_test", color="#666", dashes=True))
-    edges.append(Edge(source="na_test", target="na_precip", color="#666", dashes=True))
-
-    nodes.append(Node(id="nh4_test", label="NH₄⁺: + NaOH\n+ panas", color="#FF9800", size=25))
-    nodes.append(Node(id="nh4_gas", label="Gas NH₃\n(Berbau tajam)", color="#E0E0E0", size=25, shape="box"))
-    edges.append(Edge(source="group5", target="nh4_test", color="#666", dashes=True))
-    edges.append(Edge(source="nh4_test", target="nh4_gas", color="#666", dashes=True))
-
-    return nodes, edges
+    col_yes, col_no = st.columns(2)
+    with col_yes:
+        if st.button("✅  Ya — Teramati", use_container_width=True, key=f"yes_{curr_id}"):
+            st.session_state.dig_history.append((curr_id, True))
+            nxt = q["yes"]
+            if nxt.startswith("confirm_") or nxt == "no_match":
+                st.session_state.dig_result = nxt
+            else:
+                st.session_state.dig_current = nxt
+            st.rerun()
+    with col_no:
+        if st.button("❌  Tidak — Tidak Teramati", use_container_width=True, key=f"no_{curr_id}"):
+            st.session_state.dig_history.append((curr_id, False))
+            nxt = q["no"]
+            if nxt.startswith("confirm_") or nxt == "no_match":
+                st.session_state.dig_result = nxt
+            else:
+                st.session_state.dig_current = nxt
+            st.rerun()
 
 # ============================================
 # SIDEBAR
 # ============================================
 
-st.sidebar.title("🧪 Navigasi")
+st.sidebar.markdown("## ⚗️ Analisis Kation")
+
+# Theme toggle
+dm = st.session_state.dark_mode
+mode_label = "🌙 Mode Gelap" if dm else "☀️ Mode Terang"
+st.sidebar.markdown(f'<div class="theme-status">{mode_label} aktif</div>', unsafe_allow_html=True)
+if st.sidebar.button("🔄 Ganti Tema", use_container_width=True):
+    st.session_state.dark_mode = not st.session_state.dark_mode
+    st.rerun()
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📌 Menu")
+
 page = st.sidebar.radio(
-    "Pilih Menu:",
-    ["🏠 Beranda", "📊 Bagan Interaktif", "🔬 Detail Reaksi", "📝 Kuis", "📚 Referensi"]
+    "Navigasi:",
+    ["🏠 Beranda", "🔍 Digitalisasi Kimia", "📊 Bagan Analisis", "🔬 Detail Reaksi", "📝 Kuis", "📚 Referensi"],
+    label_visibility="collapsed"
 )
 
+st.sidebar.markdown("---")
+st.sidebar.markdown("""
+<div style="font-size:0.8rem; opacity:0.6; line-height:1.6;">
+Mencakup Golongan I, III, dan IV<br>
+Versi 3.0 | 2026
+</div>
+""", unsafe_allow_html=True)
+
 # ============================================
-# HALAMAN BERANDA
+# HALAMAN: BERANDA
 # ============================================
 
 if page == "🏠 Beranda":
-    st.markdown('<h1 class="main-header">🧪 Analisis Kation Golongan I, III, IV, V</h1>', unsafe_allow_html=True)
+    dm = st.session_state.dark_mode
+    accent = "#5c7cfa" if dm else "#3a5bd9"
+    text   = "#e8eaf6" if dm else "#1a1a2e"
+    card   = "#1e2130" if dm else "#ffffff"
+    border = "#2d3561" if dm else "#d0d9f0"
 
-    col1, col2 = st.columns([2, 1])
+    st.markdown("""
+    <div class="main-header">
+        <h1>⚗️ Analisis Kation<br>Golongan I, III, IV</h1>
+        <p>Sistem pembelajaran kimia analitik berbasis web — interaktif & komprehensif</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2 = st.columns([3, 2])
 
     with col1:
-        st.markdown("""
-        <div style="font-size: 1.2rem; line-height: 1.8;">
-        <p>Selamat datang di aplikasi <strong>Analisis Kation</strong>!</p>
-        <p>Aplikasi ini dirancang untuk membantu memahami skema analisis kation secara sistematis.</p>
-        
-        <div style="background-color: #fff3cd; padding: 15px; border-radius: 10px; border-left: 5px solid #ffc107; margin: 15px 0;">
-            <strong>⚠️ Catatan Penting:</strong> Aplikasi ini mencakup <strong>Golongan I, III, IV, dan V</strong> saja. 
-            Golongan II (Cu²⁺, Cd²⁺, Bi³⁺, Hg²⁺, Sn²⁺, Sb³⁺, As³⁺) dilewati dalam analisis ini.
+        st.markdown(f"""
+        <div class="cation-card">
+            <h3 style="color:{accent};">🔬 Kation yang Dianalisis</h3>
+            <table class="styled-table">
+                <tr>
+                    <th>Golongan</th>
+                    <th>Kation</th>
+                    <th>Reagen Pengendap</th>
+                    <th>Endapan</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-I">I</span></td>
+                    <td><span class="mono">Ag⁺, Pb²⁺, Hg₂²⁺</span></td>
+                    <td>HCl encer</td>
+                    <td class="p-white">Putih</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-III">III</span></td>
+                    <td><span class="mono">Fe³⁺, Al³⁺, Cr³⁺</span></td>
+                    <td>NH₄OH + NH₄Cl</td>
+                    <td class="p-brown">Coklat/Putih/Abu²</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-IV">IV</span></td>
+                    <td><span class="mono">Ba²⁺, Sr²⁺, Ca²⁺</span></td>
+                    <td>(NH₄)₂CO₃ + NH₄OH + NH₄Cl</td>
+                    <td class="p-white">Putih</td>
+                </tr>
+            </table>
         </div>
+        """, unsafe_allow_html=True)
 
-        <h3 style="color: #1f77b4;">📋 Fitur Utama:</h3>
-        <ul>
-            <li><strong>Bagan Interaktif</strong> - Visualisasi lengkap alur analisis</li>
-            <li><strong>Detail Reaksi</strong> - Penjelasan step-by-step setiap reaksi</li>
-            <li><strong>Kuis Interaktif</strong> - Uji pemahaman (soal acak dari bank soal)</li>
-            <li><strong>Referensi</strong> - Tabel ringkasan reaksi dan warna endapan</li>
-        </ul>
-
-        <h3 style="color: #1f77b4;">🔬 Kation yang Dianalisis:</h3>
-        <table style="width:100%; border-collapse: collapse;">
-            <tr style="background-color: #f0f2f6;">
-                <th style="padding: 10px; border: 1px solid #ddd;">Golongan</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Kation</th>
-                <th style="padding: 10px; border: 1px solid #ddd;">Reagen Pengendap</th>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;"><strong>I</strong></td>
-                <td style="padding: 10px; border: 1px solid #ddd;">Ag⁺, Pb²⁺, Hg₂²⁺</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">HCl encer</td>
-            </tr>
-            <tr style="background-color: #f9f9f9;">
-                <td style="padding: 10px; border: 1px solid #ddd;"><strong>III</strong></td>
-                <td style="padding: 10px; border: 1px solid #ddd;">Fe³⁺, Al³⁺, Cr³⁺</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">NH₄OH + NH₄Cl</td>
-            </tr>
-            <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;"><strong>IV</strong></td>
-                <td style="padding: 10px; border: 1px solid #ddd;">Ba²⁺, Sr²⁺, Ca²⁺</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">(NH₄)₂CO₃ + NH₄OH + NH₄Cl</td>
-            </tr>
-            <tr style="background-color: #f9f9f9;">
-                <td style="padding: 10px; border: 1px solid #ddd;"><strong>V</strong></td>
-                <td style="padding: 10px; border: 1px solid #ddd;">Mg²⁺, K⁺, Na⁺, NH₄⁺</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">Tidak terendap</td>
-            </tr>
-        </table>
+        st.markdown(f"""
+        <div class="warning-box">
+            <strong>⚠️ Catatan:</strong> Golongan II dan V <strong>tidak dibahas</strong> dalam aplikasi ini.
+            Golongan II (Cu²⁺, Cd²⁺, Bi³⁺, Hg²⁺, Sn²⁺, Sb³⁺, As³⁺) dilewati, 
+            dan Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺) tidak tercakup dalam analisis ini.
         </div>
         """, unsafe_allow_html=True)
 
     with col2:
-        st.markdown("""
-        <div style="background-color: #e3f2fd; padding: 20px; border-radius: 15px; margin-top: 20px;">
-            <h3 style="color: #1565c0;">💡 Tips Penggunaan</h3>
-            <ol>
-                <li>Pelajari <strong>Bagan Interaktif</strong> untuk memahami alur analisis</li>
-                <li>Baca <strong>Detail Reaksi</strong> untuk memahami setiap langkah</li>
-                <li>Uji pemahaman dengan <strong>Kuis</strong> per golongan</li>
-                <li>Gunakan <strong>Referensi</strong> untuk mengingat kembali</li>
-            </ol>
-            <p style="margin-top: 20px; font-style: italic; color: #555;">
-                "Kimia analitik adalah seni memisahkan dan mengidentifikasi"
-            </p>
+        features = [
+            ("🔍", "Digitalisasi Kimia", "Identifikasi kation secara interaktif melalui tanya-jawab berbasis observasi lab"),
+            ("📊", "Bagan Analisis", "Visualisasi alur analisis dari sampel hingga konfirmasi kation"),
+            ("🔬", "Detail Reaksi", "Penjelasan step-by-step setiap reaksi kimia"),
+            ("📝", "Kuis Interaktif", "Uji pemahaman dengan 10 soal acak per golongan"),
+            ("📚", "Referensi", "Tabel warna endapan dan rangkuman reaksi lengkap"),
+        ]
+        for icon, title, desc in features:
+            st.markdown(f"""
+            <div class="cation-card" style="padding:1rem 1.2rem; margin:0.5rem 0;">
+                <div style="display:flex; align-items:flex-start; gap:12px;">
+                    <span style="font-size:1.4rem;">{icon}</span>
+                    <div>
+                        <strong style="color:{accent};">{title}</strong>
+                        <p style="margin:0.2rem 0 0 0; font-size:0.87rem; color:{text}; opacity:0.8;">{desc}</p>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ============================================
+# HALAMAN: DIGITALISASI KIMIA
+# ============================================
+
+elif page == "🔍 Digitalisasi Kimia":
+    render_digitalisasi()
+
+# ============================================
+# HALAMAN: BAGAN ANALISIS
+# ============================================
+
+elif page == "📊 Bagan Analisis":
+    dm = st.session_state.dark_mode
+    accent = "#5c7cfa" if dm else "#3a5bd9"
+    text   = "#e8eaf6" if dm else "#1a1a2e"
+    card   = "#1e2130" if dm else "#ffffff"
+    border = "#2d3561" if dm else "#d0d9f0"
+    bg     = "#151825" if dm else "#f0f4ff"
+
+    st.markdown("""
+    <div class="main-header">
+        <h1>📊 Bagan Alur Analisis Kation</h1>
+        <p>Alur sistematis dari sampel hingga identifikasi kation</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    def flow_node(label, color, shape="box", note=""):
+        return f"""
+        <div style="background:{color}20; border:2px solid {color}; border-radius:12px;
+            padding:10px 16px; text-align:center; margin:4px auto; max-width:280px;
+            color:{text}; font-size:0.88rem; font-weight:600; line-height:1.4;">
+            {label}
+            {f'<div style="font-size:0.75rem; opacity:0.7; font-weight:400; margin-top:4px;">{note}</div>' if note else ''}
         </div>
-        """, unsafe_allow_html=True)
+        """
+
+    def arrow(label=""):
+        return f"""
+        <div style="text-align:center; color:{text}; opacity:0.5; font-size:1.2rem; margin:2px 0;">
+            ↓{f' <span style="font-size:0.78rem;">{label}</span>' if label else ''}
+        </div>
+        """
+
+    def branch_label(txt, color):
+        return f'<div style="text-align:center; color:{color}; font-size:0.78rem; font-weight:600; margin:2px 0;">{txt}</div>'
+
+    # === GOLONGAN I ===
+    st.markdown(f"### <span class='badge badge-I'>Golongan I</span>", unsafe_allow_html=True)
+
+    st.markdown(flow_node("🧪 SAMPEL<br>Ag⁺, Pb²⁺, Hg₂²⁺, Fe³⁺, Al³⁺, Cr³⁺, Ba²⁺, Sr²⁺, Ca²⁺", accent), unsafe_allow_html=True)
+    st.markdown(arrow("+ HCl encer"), unsafe_allow_html=True)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown(flow_node("⬇️ Endapan Putih<br>AgCl, PbCl₂, Hg₂Cl₂", "#FF6B6B", note="GOLONGAN I"), unsafe_allow_html=True)
+        st.markdown(arrow("+ H₂O panas"), unsafe_allow_html=True)
+        ca, cb = st.columns(2)
+        with ca:
+            st.markdown(flow_node("Filtrat: Pb²⁺<br>(larut)", "#FFD93D"), unsafe_allow_html=True)
+            st.markdown(arrow("+ K₂CrO₄"), unsafe_allow_html=True)
+            st.markdown(flow_node("🟡 PbCrO₄↓<br>Kuning → Pb²⁺ ✅", "#FFD93D"), unsafe_allow_html=True)
+        with cb:
+            st.markdown(flow_node("Residu: AgCl,<br>Hg₂Cl₂", "#9E9E9E"), unsafe_allow_html=True)
+            st.markdown(arrow("+ NH₄OH"), unsafe_allow_html=True)
+            caa, cab = st.columns(2)
+            with caa:
+                st.markdown(flow_node("[Ag(NH₃)₂]⁺<br>(larut)", "#4ECDC4"), unsafe_allow_html=True)
+                st.markdown(arrow("+ HNO₃"), unsafe_allow_html=True)
+                st.markdown(flow_node("⚪ AgCl↓<br>Putih → Ag⁺ ✅", "#9E9E9E"), unsafe_allow_html=True)
+            with cab:
+                st.markdown(flow_node("⚫ Hg↓ + Hg(NH₂)Cl<br>Hitam+Putih → Hg₂²⁺ ✅", "#616161"), unsafe_allow_html=True)
+    with c2:
+        st.markdown(flow_node("→ Filtrat<br>ke Golongan III", border, note="(skip Gol. II)"), unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # === GOLONGAN III ===
+    st.markdown(f"### <span class='badge badge-III'>Golongan III</span>", unsafe_allow_html=True)
+    st.markdown(flow_node("Filtrat dari Gol. I<br>Fe³⁺, Al³⁺, Cr³⁺, Ba²⁺, Sr²⁺, Ca²⁺", "#4ECDC4"), unsafe_allow_html=True)
+    st.markdown(arrow("+ NH₄OH + NH₄Cl"), unsafe_allow_html=True)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown(flow_node("⬇️ Endapan<br>Fe(OH)₃ (Coklat)<br>Al(OH)₃ (Putih/Gel)<br>Cr(OH)₃ (Abu-abu)", "#4ECDC4", note="GOLONGAN III"), unsafe_allow_html=True)
+        st.markdown(arrow("+ NaOH berlebih + H₂O₂"), unsafe_allow_html=True)
+        ca, cb = st.columns(2)
+        with ca:
+            st.markdown(flow_node("Residu: Fe(OH)₃<br>(tidak larut)", "#8D6E63"), unsafe_allow_html=True)
+            st.markdown(arrow("+ HCl + KSCN"), unsafe_allow_html=True)
+            st.markdown(flow_node("🔴 [Fe(SCN)]²⁺<br>Merah Darah → Fe³⁺ ✅", "#F44336"), unsafe_allow_html=True)
+        with cb:
+            st.markdown(flow_node("Filtrat: [Al(OH)₄]⁻<br>+ CrO₄²⁻", "#C8E6C9"), unsafe_allow_html=True)
+            caa, cab = st.columns(2)
+            with caa:
+                st.markdown(arrow("+ HCl perlahan"), unsafe_allow_html=True)
+                st.markdown(flow_node("⚪ Al(OH)₃↓<br>Putih/Gel → Al³⁺ ✅", "#E0E0E0"), unsafe_allow_html=True)
+            with cab:
+                st.markdown(arrow("+ Pb(NO₃)₂"), unsafe_allow_html=True)
+                st.markdown(flow_node("🟡 PbCrO₄↓<br>Kuning → Cr³⁺ ✅", "#FFD93D"), unsafe_allow_html=True)
+    with c2:
+        st.markdown(flow_node("→ Filtrat<br>ke Golongan IV", border, note="Ba²⁺, Sr²⁺, Ca²⁺"), unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # === GOLONGAN IV ===
+    st.markdown(f"### <span class='badge badge-IV'>Golongan IV</span>", unsafe_allow_html=True)
+    st.markdown(flow_node("Filtrat dari Gol. III<br>Ba²⁺, Sr²⁺, Ca²⁺", "#FFD93D"), unsafe_allow_html=True)
+    st.markdown(arrow("+ (NH₄)₂CO₃ + NH₄OH + NH₄Cl"), unsafe_allow_html=True)
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown(flow_node("⬇️ Endapan Putih<br>BaCO₃, SrCO₃, CaCO₃", "#FFD93D", note="GOLONGAN IV"), unsafe_allow_html=True)
+        st.markdown(arrow("+ CH₃COOH (larutkan)"), unsafe_allow_html=True)
+        st.markdown(flow_node("Ba²⁺, Sr²⁺, Ca²⁺<br>(larutan asetat)", "#FFF9C4"), unsafe_allow_html=True)
+        st.markdown(arrow("+ K₂CrO₄"), unsafe_allow_html=True)
+        ca, cb = st.columns(2)
+        with ca:
+            st.markdown(flow_node("🟡 BaCrO₄↓<br>Kuning → Ba²⁺ ✅", "#FFD93D"), unsafe_allow_html=True)
+        with cb:
+            st.markdown(flow_node("Filtrat: Sr²⁺, Ca²⁺", "#FFF9C4"), unsafe_allow_html=True)
+            st.markdown(arrow("+ (NH₄)₂SO₄"), unsafe_allow_html=True)
+            caa, cab = st.columns(2)
+            with caa:
+                st.markdown(flow_node("⚪ SrSO₄↓<br>Putih → Sr²⁺ ✅", "#E0E0E0"), unsafe_allow_html=True)
+            with cab:
+                st.markdown(flow_node("Filtrat: Ca²⁺", "#FFF9C4"), unsafe_allow_html=True)
+                st.markdown(arrow("+ (NH₄)₂C₂O₄"), unsafe_allow_html=True)
+                st.markdown(flow_node("⚪ CaC₂O₄↓<br>Putih → Ca²⁺ ✅", "#E0E0E0"), unsafe_allow_html=True)
+    with c2:
+        st.markdown(flow_node("→ Filtrat Golongan V<br>(tidak dianalisis)", border), unsafe_allow_html=True)
 
 # ============================================
-# HALAMAN BAGAN INTERAKTIF
-# ============================================
-
-elif page == "📊 Bagan Interaktif":
-    st.markdown('<h1 class="main-header">📊 Bagan Analisis Kation</h1>', unsafe_allow_html=True)
-
-    st.info("🖱️ **Cara menggunakan:** Klik dan drag untuk navigasi, scroll untuk zoom. Hover pada node untuk melihat detail. Garis putus-putus = alur yang dilewati/dilewati.")
-
-    nodes, edges = create_flowchart_nodes()
-
-    config = Config(
-        width=1400,
-        height=900,
-        directed=True,
-        physics=True,
-        hierarchical=True,
-        nodeHighlightBehavior=True,
-        highlightColor="#F57C00",
-        collapsible=True,
-        node={'labelProperty': 'label'},
-        link={'labelProperty': 'label', 'renderLabel': False},
-        hierarchicalLayout={
-            'direction': 'UD',
-            'sortMethod': 'directed',
-            'levelSeparation': 180,
-            'nodeSpacing': 220
-        }
-    )
-
-    return_value = agraph(nodes=nodes, edges=edges, config=config)
-
-    if return_value:
-        st.success(f"Anda memilih: **{return_value}**")
-
-        node_details = {
-            "sample": "Sampel awal mengandung kation: Ag⁺, Pb²⁺, Hg₂²⁺, Fe³⁺, Al³⁺, Cr³⁺, Ba²⁺, Sr²⁺, Ca²⁺, Mg²⁺, K⁺, Na⁺, NH₄⁺",
-            "group1": "Endapan putih terbentuk: AgCl, PbCl₂, Hg₂Cl₂. Ini adalah Golongan I.",
-            "filtrat1": "Filtrat mengandung kation Golongan II-V. Dalam aplikasi ini, Golongan II dilewati.",
-            "pb": "PbCl₂ larut dalam air panas karena kelarutannya meningkat dengan suhu.",
-            "ag_hg": "AgCl dan Hg₂Cl₂ tidak larut dalam air panas.",
-            "pbcro4": "PbCrO₄ adalah endapan kuning yang mengkonfirmasi keberadaan Pb²⁺.",
-            "ag_complex": "[Ag(NH₃)₂]⁺ adalah kompleks diamminperak(I) yang larut.",
-            "hg_mix": "Hg₂Cl₂ mengalami disproporsionasi: Hg₂²⁺ → Hg⁰ + Hg²⁺",
-            "agcl_back": "AgCl terendap kembali saat ditambahkan asam kuat (HNO₃).",
-            "skip_g2_note": "Golongan II (Cu²⁺, Cd²⁺, Bi³⁺, Hg²⁺, Sn²⁺, Sb³⁺, As³⁺) dilewati dalam analisis ini.",
-            "group3": "Endapan terbentuk: Fe(OH)₃ (coklat), Al(OH)₃ (putih/gel), Cr(OH)₃ (abu-abu/hijau). Ini adalah Golongan III.",
-            "filtrat3": "Filtrat mengandung kation Golongan IV dan V.",
-            "fe_oh": "Fe(OH)₃ tidak larut dalam basa berlebih (bersifat basa).",
-            "al_cr_sol": "Al(OH)₃ larut menjadi [Al(OH)₄]⁻. Cr(OH)₃ dioksidasi menjadi CrO₄²⁻.",
-            "al_oh_back": "Al(OH)₃ terendap kembali saat ditambahkan asam perlahan.",
-            "fe_red": "[Fe(SCN)]²⁺ adalah kompleks berwarna merah darah yang sangat sensitif.",
-            "cr_yellow": "PbCrO₄ berwarna kuning mengkonfirmasi Cr³⁺.",
-            "group4": "Endapan putih terbentuk: BaCO₃, SrCO₃, CaCO₃. Ini adalah Golongan IV.",
-            "filtrat4": "Filtrat mengandung kation Golongan V.",
-            "acetates": "Semua karbonat dilarutkan dengan asam asetat menjadi asetat.",
-            "ba_cro4": "BaCrO₄ berwarna kuning mengkonfirmasi Ba²⁺.",
-            "sr_so4": "SrSO₄ berwarna putih mengkonfirmasi Sr²⁺.",
-            "ca_ox": "CaC₂O₄ berwarna putih mengkonfirmasi Ca²⁺.",
-            "group5": "Kation residu yang tidak terendap: Mg²⁺, K⁺, Na⁺, NH₄⁺. Ini adalah Golongan V.",
-            "mg_precip": "MgNH₄PO₄·6H₂O (struvit) berwarna putih kristalin.",
-            "k_precip": "KHC₄H₄O₆ berwarna putih mengkonfirmasi K⁺.",
-            "na_precip": "Kristal kuning NaZn(UO₂)₃(CH₃COO)₉ mengkonfirmasi Na⁺.",
-            "nh4_gas": "Gas NH₃ berbau tajam mengkonfirmasi NH₄⁺."
-        }
-
-        if return_value in node_details:
-            st.markdown(f'<div class="reaction-box">{node_details[return_value]}</div>', 
-                       unsafe_allow_html=True)
-
-# ============================================
-# HALAMAN DETAIL REAKSI
+# HALAMAN: DETAIL REAKSI
 # ============================================
 
 elif page == "🔬 Detail Reaksi":
-    st.markdown('<h1 class="main-header">🔬 Detail Reaksi Analisis</h1>', unsafe_allow_html=True)
+    dm = st.session_state.dark_mode
+    accent = "#5c7cfa" if dm else "#3a5bd9"
+    text   = "#e8eaf6" if dm else "#1a1a2e"
 
-    tab1, tab2, tab3, tab4 = st.tabs([
-        "Golongan I (Ag⁺, Pb²⁺, Hg₂²⁺)", 
-        "Golongan III (Fe³⁺, Al³⁺, Cr³⁺)",
-        "Golongan IV (Ba²⁺, Sr²⁺, Ca²⁺)",
-        "Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺)"
+    st.markdown("""
+    <div class="main-header">
+        <h1>🔬 Detail Reaksi Analisis</h1>
+        <p>Penjelasan langkah-demi-langkah setiap reaksi kimia</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    tab1, tab2, tab3 = st.tabs([
+        "⬛ Golongan I  (Ag⁺, Pb²⁺, Hg₂²⁺)",
+        "🟦 Golongan III  (Fe³⁺, Al³⁺, Cr³⁺)",
+        "🟨 Golongan IV  (Ba²⁺, Sr²⁺, Ca²⁺)"
     ])
 
-    with tab1:
-        st.markdown('<h2 class="sub-header">Analisis Golongan I</h2>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="cation-card">
-            <h3>🧪 Reagen Pengendap: HCl encer</h3>
-            <p><strong>Reaksi:</strong></p>
-            <ul>
-                <li>Ag⁺ + Cl⁻ → <span class="precipitate-white">AgCl↓ (Putih)</span></li>
-                <li>Pb²⁺ + 2Cl⁻ → <span class="precipitate-white">PbCl₂↓ (Putih)</span></li>
-                <li>Hg₂²⁺ + 2Cl⁻ → <span class="precipitate-white">Hg₂Cl₂↓ (Putih)</span></li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-
-        for i, step in enumerate(cation_data["Golongan I (Ag⁺, Pb²⁺, Hg₂²⁺)"]["steps"], 1):
+    def render_steps(group_key, rxns_html):
+        st.markdown(rxns_html, unsafe_allow_html=True)
+        for i, step in enumerate(cation_data[group_key]["steps"], 1):
             with st.expander(f"Langkah {i}: {step['action']}"):
+                confirm_html = f'<div class="success-box" style="margin-top:8px;"><strong>✅ Konfirmasi:</strong> {step["confirm"]}</div>' if 'confirm' in step else ''
+                filtrate_html = f'<p style="color:{text};"><strong>Filtrat:</strong> {step["filtrate"]}</p>' if 'filtrate' in step else ''
+                residue_html  = f'<p style="color:{text};"><strong>Residu:</strong> {step["residue"]}</p>' if 'residue' in step else ''
                 st.markdown(f"""
                 <div class="reaction-box">
-                    <p><strong>Aksi:</strong> {step['action']}</p>
-                    <p><strong>Hasil:</strong> {step['result']}</p>
-                    {f'<p><strong>Filtrat:</strong> {step["filtrate"]}</p>' if 'filtrate' in step else ''}
-                    {f'<p><strong>Residu:</strong> {step["residue"]}</p>' if 'residue' in step else ''}
-                    {f'<p><strong>Konfirmasi:</strong> <span style="color: green;">{step["confirm"]}</span></p>' if 'confirm' in step else ''}
+                    <p style="color:{text};"><strong>Aksi:</strong> {step['action']}</p>
+                    <p style="color:{text};"><strong>Hasil:</strong> {step['result']}</p>
+                    {filtrate_html}{residue_html}
                 </div>
+                {confirm_html}
                 """, unsafe_allow_html=True)
+
+    with tab1:
+        render_steps("Golongan I", f"""
+        <div class="cation-card">
+            <h3 style="color:{accent};">🧪 Reagen: HCl encer</h3>
+            <ul style="color:{st.session_state.dark_mode and '#e8eaf6' or '#1a1a2e'};">
+                <li>Ag⁺ + Cl⁻ → <span class="p-white">AgCl↓ (Putih)</span></li>
+                <li>Pb²⁺ + 2Cl⁻ → <span class="p-white">PbCl₂↓ (Putih)</span></li>
+                <li>Hg₂²⁺ + 2Cl⁻ → <span class="p-white">Hg₂Cl₂↓ (Putih)</span></li>
+            </ul>
+        </div>
+        """)
 
     with tab2:
-        st.markdown('<h2 class="sub-header">Analisis Golongan III</h2>', unsafe_allow_html=True)
-        st.markdown("""
+        render_steps("Golongan III", f"""
         <div class="cation-card">
-            <h3>🧪 Reagen Pengendap: NH₄OH berlebih + NH₄Cl</h3>
-            <p><strong>Reaksi:</strong></p>
-            <ul>
-                <li>Fe³⁺ + 3OH⁻ → <span class="precipitate-brown">Fe(OH)₃↓ (Coklat/Merah)</span></li>
-                <li>Al³⁺ + 3OH⁻ → <span class="precipitate-white">Al(OH)₃↓ (Putih/Gel)</span></li>
-                <li>Cr³⁺ + 3OH⁻ → <span style="color: #6B8E23; font-weight: bold;">Cr(OH)₃↓ (Abu-abu/Hijau)</span></li>
+            <h3 style="color:{accent};">🧪 Reagen: NH₄OH + NH₄Cl</h3>
+            <ul style="color:{st.session_state.dark_mode and '#e8eaf6' or '#1a1a2e'};">
+                <li>Fe³⁺ + 3OH⁻ → <span class="p-brown">Fe(OH)₃↓ (Coklat/Merah)</span></li>
+                <li>Al³⁺ + 3OH⁻ → <span class="p-white">Al(OH)₃↓ (Putih/Gel)</span></li>
+                <li>Cr³⁺ + 3OH⁻ → <span class="p-green">Cr(OH)₃↓ (Abu-abu/Hijau)</span></li>
             </ul>
-            <p><em>⚠️ <strong>NH₄Cl berfungsi sebagai penyangga</strong> untuk menekan [OH⁻] agar Mg²⁺ tidak ikut terendap sebagai Mg(OH)₂</em></p>
+            <div class="info-box">⚠️ <strong>NH₄Cl</strong> berfungsi sebagai penyangga untuk menekan [OH⁻] agar Mg²⁺ tidak terendap.</div>
         </div>
-        """, unsafe_allow_html=True)
-
-        for i, step in enumerate(cation_data["Golongan III (Fe³⁺, Al³⁺, Cr³⁺)"]["steps"], 1):
-            with st.expander(f"Langkah {i}: {step['action']}"):
-                st.markdown(f"""
-                <div class="reaction-box">
-                    <p><strong>Aksi:</strong> {step['action']}</p>
-                    <p><strong>Hasil:</strong> {step['result']}</p>
-                    {f'<p><strong>Filtrat:</strong> {step["filtrate"]}</p>' if 'filtrate' in step else ''}
-                    {f'<p><strong>Residu:</strong> {step["residue"]}</p>' if 'residue' in step else ''}
-                    {f'<p><strong>Konfirmasi:</strong> <span style="color: green;">{step["confirm"]}</span></p>' if 'confirm' in step else ''}
-                </div>
-                """, unsafe_allow_html=True)
+        """)
 
     with tab3:
-        st.markdown('<h2 class="sub-header">Analisis Golongan IV</h2>', unsafe_allow_html=True)
-        st.markdown("""
+        render_steps("Golongan IV", f"""
         <div class="cation-card">
-            <h3>🧪 Reagen Pengendap: (NH₄)₂CO₃ + NH₄OH + NH₄Cl</h3>
-            <p><strong>Reaksi:</strong></p>
-            <ul>
-                <li>Ba²⁺ + CO₃²⁻ → <span class="precipitate-white">BaCO₃↓ (Putih)</span></li>
-                <li>Sr²⁺ + CO₃²⁻ → <span class="precipitate-white">SrCO₃↓ (Putih)</span></li>
-                <li>Ca²⁺ + CO₃²⁻ → <span class="precipitate-white">CaCO₃↓ (Putih)</span></li>
+            <h3 style="color:{accent};">🧪 Reagen: (NH₄)₂CO₃ + NH₄OH + NH₄Cl</h3>
+            <ul style="color:{st.session_state.dark_mode and '#e8eaf6' or '#1a1a2e'};">
+                <li>Ba²⁺ + CO₃²⁻ → <span class="p-white">BaCO₃↓ (Putih)</span></li>
+                <li>Sr²⁺ + CO₃²⁻ → <span class="p-white">SrCO₃↓ (Putih)</span></li>
+                <li>Ca²⁺ + CO₃²⁻ → <span class="p-white">CaCO₃↓ (Putih)</span></li>
             </ul>
-            <p><em>NH₄Cl mencegah pengendapan MgCO₃ yang juga dapat terbentuk dalam kondisi basa</em></p>
+            <div class="info-box">💡 <strong>NH₄Cl</strong> mencegah pengendapan MgCO₃ yang tidak diinginkan.</div>
         </div>
-        """, unsafe_allow_html=True)
-
-        for i, step in enumerate(cation_data["Golongan IV (Ba²⁺, Sr²⁺, Ca²⁺)"]["steps"], 1):
-            with st.expander(f"Langkah {i}: {step['action']}"):
-                st.markdown(f"""
-                <div class="reaction-box">
-                    <p><strong>Aksi:</strong> {step['action']}</p>
-                    <p><strong>Hasil:</strong> {step['result']}</p>
-                    {f'<p><strong>Filtrat:</strong> {step["filtrate"]}</p>' if 'filtrate' in step else ''}
-                    {f'<p><strong>Residu:</strong> {step["residue"]}</p>' if 'residue' in step else ''}
-                    {f'<p><strong>Konfirmasi:</strong> <span style="color: green;">{step["confirm"]}</span></p>' if 'confirm' in step else ''}
-                </div>
-                """, unsafe_allow_html=True)
-
-    with tab4:
-        st.markdown('<h2 class="sub-header">Analisis Golongan V</h2>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="cation-card">
-            <h3>🧪 Tidak ada reagen pengendap spesifik</h3>
-            <p>Kation Golongan V adalah <strong>kation residu</strong> yang tersisa setelah pengendapan Golongan I-IV.</p>
-            <p><strong>Reaksi Konfirmasi:</strong></p>
-            <ul>
-                <li>Mg²⁺ + NH₄⁺ + PO₄³⁻ → <span class="precipitate-white">MgNH₄PO₄·6H₂O↓ (Putih)</span></li>
-                <li>K⁺ + HC₄H₄O₆⁻ → <span class="precipitate-white">KHC₄H₄O₆↓ (Putih)</span></li>
-                <li>Na⁺ + Zn(UO₂)₃(CH₃COO)₈ → <span class="precipitate-yellow">NaZn(UO₂)₃(CH₃COO)₉·6H₂O (Kuning)</span></li>
-                <li>NH₄⁺ + OH⁻ → <span class="solution-red">NH₃↑ + H₂O</span></li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-
-        for i, step in enumerate(cation_data["Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺)"]["steps"], 1):
-            with st.expander(f"Langkah {i}: {step['action']}"):
-                st.markdown(f"""
-                <div class="reaction-box">
-                    <p><strong>Aksi:</strong> {step['action']}</p>
-                    <p><strong>Hasil:</strong> {step['result']}</p>
-                    {f'<p><strong>Konfirmasi:</strong> <span style="color: green;">{step["confirm"]}</span></p>' if 'confirm' in step else ''}
-                </div>
-                """, unsafe_allow_html=True)
+        """)
 
 # ============================================
-# HALAMAN KUIS (MENGGUNAKAN STORAGE SOAL)
+# HALAMAN: KUIS
 # ============================================
 
 elif page == "📝 Kuis":
-    st.markdown('<h1 class="main-header">📝 Kuis Analisis Kation</h1>', unsafe_allow_html=True)
+    dm = st.session_state.dark_mode
+    accent = "#5c7cfa" if dm else "#3a5bd9"
+    text   = "#e8eaf6" if dm else "#1a1a2e"
+    green  = "#56cf86" if dm else "#1a9e56"
+    red    = "#ff6b6b" if dm else "#d32f2f"
 
-    # Pilih golongan
+    st.markdown("""
+    <div class="main-header">
+        <h1>📝 Kuis Analisis Kation</h1>
+        <p>Uji pemahaman Anda — 10 soal acak per golongan</p>
+    </div>
+    """, unsafe_allow_html=True)
+
     selected_group = st.selectbox(
         "Pilih Golongan:",
-        ["Golongan I", "Golongan III", "Golongan IV", "Golongan V"]
+        ["Golongan I", "Golongan III", "Golongan IV"]
     )
 
-    # Ambil soal acak dari storage (10 soal)
     quiz_key = f"quiz_state_{selected_group.replace(' ', '_')}"
 
     if quiz_key not in st.session_state:
@@ -688,75 +1514,67 @@ elif page == "📝 Kuis":
     state = st.session_state[quiz_key]
     quiz_list = state['shuffled_questions']
 
-    # Progress bar
-    progress = (state['current_question']) / len(quiz_list)
+    progress = state['current_question'] / len(quiz_list)
     st.progress(progress)
-    st.write(f"Soal {state['current_question'] + 1} dari {len(quiz_list)} | Skor: {state['score']}")
+    st.markdown(f"<p style='color:{text};font-size:0.9rem;'>Soal {state['current_question']+1} dari {len(quiz_list)} &nbsp;|&nbsp; Skor: <strong>{state['score']}</strong></p>", unsafe_allow_html=True)
 
     if state['current_question'] < len(quiz_list):
         q = quiz_list[state['current_question']]
 
         st.markdown(f"""
-        <div class="cation-card">
+        <div class="q-box">
             <h3>{q['question']}</h3>
         </div>
         """, unsafe_allow_html=True)
 
-        # Tampilkan opsi
         for i, option in enumerate(q['options']):
-            col1, col2 = st.columns([1, 10])
-            with col1:
-                st.write(f"{chr(65+i)}.")
-            with col2:
-                if not state['answered']:
-                    if st.button(option, key=f"opt_{selected_group}_{i}_{state['current_question']}", use_container_width=True):
-                        state['answered'] = True
-                        state['selected_option'] = i
-                        if i == q['correct']:
-                            state['score'] += 1
-                        st.rerun()
-                else:
+            if not state['answered']:
+                if st.button(f"{chr(65+i)}.  {option}", key=f"opt_{selected_group}_{i}_{state['current_question']}", use_container_width=True):
+                    state['answered'] = True
+                    state['selected_option'] = i
                     if i == q['correct']:
-                        st.markdown(f'<div class="quiz-option correct">✅ {option}</div>', 
-                                   unsafe_allow_html=True)
-                    elif i == state['selected_option'] and i != q['correct']:
-                        st.markdown(f'<div class="quiz-option wrong">❌ {option}</div>', 
-                                   unsafe_allow_html=True)
-                    else:
-                        st.markdown(f'<div class="quiz-option">{option}</div>', 
-                                   unsafe_allow_html=True)
+                        state['score'] += 1
+                    st.rerun()
+            else:
+                if i == q['correct']:
+                    st.markdown(f'<div class="quiz-option correct">✅ {chr(65+i)}.  {option}</div>', unsafe_allow_html=True)
+                elif i == state['selected_option']:
+                    st.markdown(f'<div class="quiz-option wrong">❌ {chr(65+i)}.  {option}</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'<div class="quiz-option">{chr(65+i)}.  {option}</div>', unsafe_allow_html=True)
 
         if state['answered']:
             st.markdown(f"""
-            <div class="reaction-box" style="margin-top: 20px;">
-                <h4>💡 Penjelasan:</h4>
-                <p>{q['explanation']}</p>
+            <div class="reaction-box" style="margin-top:16px;">
+                <strong>💡 Penjelasan:</strong><br>{q['explanation']}
             </div>
             """, unsafe_allow_html=True)
-
             if st.button("Soal Berikutnya →", type="primary", use_container_width=True):
                 state['current_question'] += 1
                 state['answered'] = False
                 state['selected_option'] = None
                 st.rerun()
     else:
-        # Hasil akhir
-        score_percent = (state['score'] / len(quiz_list)) * 100
-
+        score_pct = (state['score'] / len(quiz_list)) * 100
+        color = green if score_pct >= 80 else (accent if score_pct >= 60 else red)
         st.markdown(f"""
-        <div class="cation-card" style="text-align: center;">
-            <h1>🎉 Kuis {selected_group} Selesai!</h1>
-            <h2>Skor Anda: {state['score']}/{len(quiz_list)} ({score_percent:.0f}%)</h2>
+        <div style="background:{color}15; border:2px solid {color}; border-radius:20px;
+            padding:2.5rem; text-align:center; margin:1rem 0;">
+            <h1 style="color:{color}; font-size:3rem; margin:0;">
+                {state['score']}/{len(quiz_list)}
+            </h1>
+            <h3 style="color:{text}; margin:0.5rem 0;">Skor Kuis {selected_group}</h3>
+            <p style="color:{text}; opacity:0.7;">{score_pct:.0f}% benar</p>
         </div>
         """, unsafe_allow_html=True)
 
-        if score_percent >= 80:
+        if score_pct >= 80:
             st.balloons()
-            st.success("🏆 Luar biasa! Anda menguasai materi ini dengan sangat baik!")
-        elif score_percent >= 60:
-            st.info("👍 Bagus! Pemahaman Anda sudah cukup baik, tingkatkan lagi!")
+            st.markdown('<div class="success-box">🏆 Luar biasa! Anda menguasai materi ini dengan sangat baik!</div>', unsafe_allow_html=True)
+        elif score_pct >= 60:
+            st.markdown('<div class="info-box">👍 Bagus! Pemahaman Anda sudah cukup baik, tingkatkan lagi!</div>', unsafe_allow_html=True)
         else:
-            st.warning("📚 Perlu belajar lagi. Pelajari bagan dan detail reaksi dengan lebih teliti.")
+            st.markdown('<div class="warning-box">📚 Perlu belajar lagi. Pelajari bagan dan detail reaksi dengan lebih teliti.</div>', unsafe_allow_html=True)
 
         if st.button("🔄 Ulangi Kuis", type="primary", use_container_width=True):
             st.session_state[quiz_key] = {
@@ -769,74 +1587,61 @@ elif page == "📝 Kuis":
             st.rerun()
 
 # ============================================
-# HALAMAN REFERENSI
+# HALAMAN: REFERENSI
 # ============================================
 
 elif page == "📚 Referensi":
-    st.markdown('<h1 class="main-header">📚 Tabel Referensi</h1>', unsafe_allow_html=True)
+    dm = st.session_state.dark_mode
+    accent = "#5c7cfa" if dm else "#3a5bd9"
+    text   = "#e8eaf6" if dm else "#1a1a2e"
 
     st.markdown("""
-    <div class="cation-card">
-        <h3>🎨 Warna Endapan dan Larutan</h3>
-        <table style="width:100%; border-collapse: collapse;">
-            <tr style="background-color: #1f77b4; color: white;">
-                <th style="padding: 12px; border: 1px solid #ddd;">Senyawa</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Warna</th>
-                <th style="padding: 12px; border: 1px solid #ddd;">Keterangan</th>
-            </tr>
-            <tr><td style="padding: 10px; border: 1px solid #ddd;">AgCl</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih</span></td><td style="padding: 10px; border: 1px solid #ddd;">Larut dalam NH₄OH</td></tr>
-            <tr style="background-color: #f9f9f9;"><td style="padding: 10px; border: 1px solid #ddd;">PbCl₂</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih</span></td><td style="padding: 10px; border: 1px solid #ddd;">Larut dalam air panas</td></tr>
-            <tr><td style="padding: 10px; border: 1px solid #ddd;">Hg₂Cl₂</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih</span></td><td style="padding: 10px; border: 1px solid #ddd;">Berubah hitam dengan NH₄OH</td></tr>
-            <tr style="background-color: #f9f9f9;"><td style="padding: 10px; border: 1px solid #ddd;">PbCrO₄</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-yellow">Kuning</span></td><td style="padding: 10px; border: 1px solid #ddd;">Konfirmasi Pb²⁺</td></tr>
-            <tr><td style="padding: 10px; border: 1px solid #ddd;">Fe(OH)₃</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-brown">Coklat/Merah</span></td><td style="padding: 10px; border: 1px solid #ddd;">Tidak larut dalam basa berlebih</td></tr>
-            <tr style="background-color: #f9f9f9;"><td style="padding: 10px; border: 1px solid #ddd;">Al(OH)₃</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih/Gel</span></td><td style="padding: 10px; border: 1px solid #ddd;">Amfoter, larut dalam NaOH berlebih</td></tr>
-            <tr><td style="padding: 10px; border: 1px solid #ddd;">Cr(OH)₃</td><td style="padding: 10px; border: 1px solid #ddd;"><span style="color: #6B8E23; font-weight: bold;">Abu-abu/Hijau</span></td><td style="padding: 10px; border: 1px solid #ddd;">Dioksidasi jadi CrO₄²⁻ dengan H₂O₂</td></tr>
-            <tr style="background-color: #f9f9f9;"><td style="padding: 10px; border: 1px solid #ddd;">BaCrO₄</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-yellow">Kuning</span></td><td style="padding: 10px; border: 1px solid #ddd;">Konfirmasi Ba²⁺</td></tr>
-            <tr><td style="padding: 10px; border: 1px solid #ddd;">SrSO₄</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih</span></td><td style="padding: 10px; border: 1px solid #ddd;">Konfirmasi Sr²⁺</td></tr>
-            <tr style="background-color: #f9f9f9;"><td style="padding: 10px; border: 1px solid #ddd;">CaC₂O₄</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih</span></td><td style="padding: 10px; border: 1px solid #ddd;">Konfirmasi Ca²⁺</td></tr>
-            <tr><td style="padding: 10px; border: 1px solid #ddd;">[Fe(SCN)]²⁺</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="solution-red">Merah Darah</span></td><td style="padding: 10px; border: 1px solid #ddd;">Konfirmasi Fe³⁺</td></tr>
-            <tr style="background-color: #f9f9f9;"><td style="padding: 10px; border: 1px solid #ddd;">MgNH₄PO₄·6H₂O</td><td style="padding: 10px; border: 1px solid #ddd;"><span class="precipitate-white">Putih</span></td><td style="padding: 10px; border: 1px solid #ddd;">Struvit, konfirmasi Mg²⁺</td></tr>
-        </table>
-    </div>
-
-    <div class="cation-card" style="margin-top: 20px;">
-        <h3>⚗️ Rangkuman Reaksi Kimia</h3>
-        <h4>Golongan I:</h4>
-        <ul>
-            <li>Pb²⁺ + 2Cl⁻ → PbCl₂↓ (Putih) → <strong>H₂O panas</strong> → larut → + K₂CrO₄ → PbCrO₄↓ (Kuning)</li>
-            <li>Ag⁺ + Cl⁻ → AgCl↓ (Putih) → <strong>NH₄OH</strong> → [Ag(NH₃)₂]⁺ → <strong>HNO₃</strong> → AgCl↓ (Putih)</li>
-            <li>Hg₂²⁺ + 2Cl⁻ → Hg₂Cl₂↓ (Putih) → <strong>NH₄OH</strong> → Hg↓ (Hitam) + Hg(NH₂)Cl↓ (Putih)</li>
-        </ul>
-        <h4>Golongan III:</h4>
-        <ul>
-            <li>Fe³⁺ + 3OH⁻ → Fe(OH)₃↓ (Coklat) → <strong>KSCN</strong> → [Fe(SCN)]²⁺ (Merah Darah)</li>
-            <li>Al³⁺ + 3OH⁻ → Al(OH)₃↓ (Putih/Gel) → <strong>NaOH berlebih</strong> → [Al(OH)₄]⁻ → <strong>HCl</strong> → Al(OH)₃↓</li>
-            <li>Cr³⁺ + 3OH⁻ → Cr(OH)₃↓ (Abu²) → <strong>NaOH + H₂O₂</strong> → CrO₄²⁻ → <strong>Pb(NO₃)₂</strong> → PbCrO₄↓ (Kuning)</li>
-        </ul>
-        <h4>Golongan IV:</h4>
-        <ul>
-            <li>Ba²⁺ + CO₃²⁻ → BaCO₃↓ (Putih) → <strong>CH₃COOH</strong> → Ba²⁺ → <strong>K₂CrO₄</strong> → BaCrO₄↓ (Kuning)</li>
-            <li>Sr²⁺ + CO₃²⁻ → SrCO₃↓ (Putih) → <strong>CH₃COOH</strong> → Sr²⁺ → <strong>(NH₄)₂SO₄</strong> → SrSO₄↓ (Putih)</li>
-            <li>Ca²⁺ + CO₃²⁻ → CaCO₃↓ (Putih) → <strong>CH₃COOH</strong> → Ca²⁺ → <strong>(NH₄)₂C₂O₄</strong> → CaC₂O₄↓ (Putih)</li>
-        </ul>
-        <h4>Golongan V:</h4>
-        <ul>
-            <li>Mg²⁺ + NH₄⁺ + PO₄³⁻ → MgNH₄PO₄·6H₂O↓ (Putih)</li>
-            <li>K⁺ + HC₄H₄O₆⁻ → KHC₄H₄O₆↓ (Putih)</li>
-            <li>Na⁺ + Zn(UO₂)₃(CH₃COO)₈ → NaZn(UO₂)₃(CH₃COO)₉·6H₂O (Kuning)</li>
-            <li>NH₄⁺ + OH⁻ → NH₃↑ + H₂O (gas berbau tajam)</li>
-        </ul>
+    <div class="main-header">
+        <h1>📚 Referensi & Tabel Ringkasan</h1>
+        <p>Warna endapan, larutan, dan rangkuman reaksi kimia</p>
     </div>
     """, unsafe_allow_html=True)
 
-# ============================================
-# FOOTER
-# ============================================
+    st.markdown(f"""
+    <div class="cation-card">
+        <h3 style="color:{accent};">🎨 Warna Endapan & Larutan</h3>
+        <table class="styled-table">
+            <tr>
+                <th>Senyawa</th><th>Warna</th><th>Keterangan</th><th>Golongan</th>
+            </tr>
+            <tr><td><span class="mono">AgCl</span></td><td class="p-white">Putih</td><td>Larut dalam NH₄OH</td><td><span class="badge badge-I">I</span></td></tr>
+            <tr><td><span class="mono">PbCl₂</span></td><td class="p-white">Putih</td><td>Larut dalam air panas</td><td><span class="badge badge-I">I</span></td></tr>
+            <tr><td><span class="mono">Hg₂Cl₂</span></td><td class="p-white">Putih</td><td>Berubah hitam + putih dengan NH₄OH</td><td><span class="badge badge-I">I</span></td></tr>
+            <tr><td><span class="mono">PbCrO₄</span></td><td class="p-yellow">Kuning</td><td>Konfirmasi Pb²⁺</td><td><span class="badge badge-I">I</span></td></tr>
+            <tr><td><span class="mono">Fe(OH)₃</span></td><td class="p-brown">Coklat/Merah</td><td>Tidak larut dalam basa berlebih</td><td><span class="badge badge-III">III</span></td></tr>
+            <tr><td><span class="mono">Al(OH)₃</span></td><td class="p-white">Putih/Gel</td><td>Amfoter — larut dalam NaOH berlebih</td><td><span class="badge badge-III">III</span></td></tr>
+            <tr><td><span class="mono">Cr(OH)₃</span></td><td class="p-green">Abu-abu/Hijau</td><td>Dioksidasi → CrO₄²⁻ dengan H₂O₂</td><td><span class="badge badge-III">III</span></td></tr>
+            <tr><td><span class="mono">[Fe(SCN)]²⁺</span></td><td class="p-red">Merah Darah</td><td>Konfirmasi Fe³⁺ — sangat sensitif</td><td><span class="badge badge-III">III</span></td></tr>
+            <tr><td><span class="mono">PbCrO₄</span></td><td class="p-yellow">Kuning</td><td>Konfirmasi Cr³⁺</td><td><span class="badge badge-III">III</span></td></tr>
+            <tr><td><span class="mono">BaCrO₄</span></td><td class="p-yellow">Kuning</td><td>Konfirmasi Ba²⁺</td><td><span class="badge badge-IV">IV</span></td></tr>
+            <tr><td><span class="mono">SrSO₄</span></td><td class="p-white">Putih</td><td>Konfirmasi Sr²⁺</td><td><span class="badge badge-IV">IV</span></td></tr>
+            <tr><td><span class="mono">CaC₂O₄</span></td><td class="p-white">Putih</td><td>Konfirmasi Ca²⁺ (struvit oksalat)</td><td><span class="badge badge-IV">IV</span></td></tr>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.sidebar.markdown("---")
-st.sidebar.info("""
-**Aplikasi Analisis Kation** 
-Dibuat untuk pembelajaran kimia analitik
+    st.markdown(f"""
+    <div class="cation-card" style="margin-top:1.5rem;">
+        <h3 style="color:{accent};">⚗️ Rangkuman Reaksi Kimia</h3>
 
-Versi 2.0 | 2026
-""")
+        <h4 style="color:{accent}; margin-top:1rem;">Golongan I</h4>
+        <div class="reaction-box">Pb²⁺ + 2Cl⁻ → PbCl₂↓  →  H₂O panas  →  larut  →  + K₂CrO₄  →  <span class="p-yellow">PbCrO₄↓ (Kuning)</span></div>
+        <div class="reaction-box">Ag⁺ + Cl⁻ → AgCl↓  →  + NH₄OH  →  [Ag(NH₃)₂]⁺  →  + HNO₃  →  <span class="p-white">AgCl↓ (Putih)</span></div>
+        <div class="reaction-box">Hg₂²⁺ + 2Cl⁻ → Hg₂Cl₂↓  →  + NH₄OH  →  <span class="p-black">Hg↓ (Hitam)</span> + <span class="p-white">Hg(NH₂)Cl↓ (Putih)</span></div>
+
+        <h4 style="color:{accent}; margin-top:1.2rem;">Golongan III</h4>
+        <div class="reaction-box">Fe³⁺ + 3OH⁻ → Fe(OH)₃↓  →  + KSCN  →  <span class="p-red">[Fe(SCN)]²⁺ (Merah Darah)</span></div>
+        <div class="reaction-box">Al³⁺ + 3OH⁻ → Al(OH)₃↓  →  + NaOH berlebih  →  [Al(OH)₄]⁻  →  + HCl  →  <span class="p-white">Al(OH)₃↓ (Putih)</span></div>
+        <div class="reaction-box">Cr³⁺ + 3OH⁻ → Cr(OH)₃↓  →  + NaOH + H₂O₂  →  CrO₄²⁻  →  + Pb(NO₃)₂  →  <span class="p-yellow">PbCrO₄↓ (Kuning)</span></div>
+
+        <h4 style="color:{accent}; margin-top:1.2rem;">Golongan IV</h4>
+        <div class="reaction-box">Ba²⁺ + CO₃²⁻ → BaCO₃↓  →  + CH₃COOH  →  Ba²⁺  →  + K₂CrO₄  →  <span class="p-yellow">BaCrO₄↓ (Kuning)</span></div>
+        <div class="reaction-box">Sr²⁺ + CO₃²⁻ → SrCO₃↓  →  + CH₃COOH  →  Sr²⁺  →  + (NH₄)₂SO₄  →  <span class="p-white">SrSO₄↓ (Putih)</span></div>
+        <div class="reaction-box">Ca²⁺ + CO₃²⁻ → CaCO₃↓  →  + CH₃COOH  →  Ca²⁺  →  + (NH₄)₂C₂O₄  →  <span class="p-white">CaC₂O₄↓ (Putih)</span></div>
+    </div>
+    """, unsafe_allow_html=True)
