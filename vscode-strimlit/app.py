@@ -1,10 +1,13 @@
 import streamlit as st
+
 from streamlit_agraph import agraph, Node, Edge, Config
+
 import random
 
 # ============================================
 # IMPORT SOAL DARI STORAGE
 # ============================================
+
 from quiz_storage import get_random_questions
 
 # ============================================
@@ -742,107 +745,136 @@ elif page == "📊 Bagan Analisis":
     st.caption("Alur sistematis dari sampel hingga identifikasi kation")
     st.divider()
 
-    # GOLONGAN I
+    # ── GOLONGAN I ──────────────────────────────────────────────
     st.subheader("⬛ Golongan I — Ag⁺, Pb²⁺, Hg₂²⁺")
+
+    # Langkah 1
     with st.container(border=True):
-        st.markdown("**🧪 SAMPEL** → + HCl encer")
-        col1, col2 = st.columns(2)
-        with col1:
+        st.markdown("**🧪 SAMPEL** mengandung Ag⁺, Pb²⁺, Hg₂²⁺")
+        st.markdown("⬇️ **+ HCl encer**")
+        col_end, col_fil = st.columns(2)
+        with col_end:
             with st.container(border=True):
-                st.markdown("**⬇️ Endapan Putih:** AgCl, PbCl₂, Hg₂Cl₂")
-                st.markdown("→ + H₂O panas")
-                ca, cb = st.columns(2)
-                with ca:
-                    with st.container(border=True):
-                        st.markdown("**Filtrat: Pb²⁺** (larut)")
-                        st.markdown("→ + K₂CrO₄")
-                        st.success("🟡 PbCrO₄↓ Kuning\n\n**Pb²⁺ ✅**")
-                with cb:
-                    with st.container(border=True):
-                        st.markdown("**Residu:** AgCl, Hg₂Cl₂")
-                        st.markdown("→ + NH₄OH")
-                        caa, cab = st.columns(2)
-                        with caa:
-                            with st.container(border=True):
-                                st.markdown("**[Ag(NH₃)₂]⁺**")
-                                st.markdown("→ + HNO₃")
-                                st.success("⚪ AgCl↓\n\n**Ag⁺ ✅**")
-                        with cab:
-                            with st.container(border=True):
-                                st.success("⚫ Hg↓ + Hg(NH₂)Cl↓\n\n**Hg₂²⁺ ✅**")
-        with col2:
+                st.markdown("**ENDAPAN PUTIH**")
+                st.markdown("AgCl, PbCl₂, Hg₂Cl₂")
+        with col_fil:
             with st.container(border=True):
-                st.markdown("**→ Filtrat ke Golongan III**")
+                st.markdown("**FILTRAT** → lanjut ke Golongan III")
                 st.caption("(skip Golongan II)")
 
+    # Langkah 2
+    st.markdown("⬇️ Endapan + **H₂O panas**")
+    col_pb, col_sisa = st.columns(2)
+    with col_pb:
+        with st.container(border=True):
+            st.markdown("**FILTRAT PANAS: Pb²⁺** (larut)")
+            st.markdown("⬇️ + K₂CrO₄")
+            st.success("🟡 **PbCrO₄↓** — Kuning → **Pb²⁺ ✅**")
+    with col_sisa:
+        with st.container(border=True):
+            st.markdown("**RESIDU: AgCl + Hg₂Cl₂** (tidak larut)")
+            st.markdown("⬇️ + NH₄OH")
+
+    # Langkah 3
+    st.markdown("⬇️ Residu + **NH₄OH**")
+    col_ag, col_hg = st.columns(2)
+    with col_ag:
+        with st.container(border=True):
+            st.markdown("**FILTRAT: [Ag(NH₃)₂]⁺** (larut)")
+            st.markdown("⬇️ + HNO₃")
+            st.success("⚪ **AgCl↓** — Putih → **Ag⁺ ✅**")
+    with col_hg:
+        with st.container(border=True):
+            st.markdown("**RESIDU: Hg₂Cl₂** (tidak larut dalam NH₄OH)")
+            st.success("⚫ **Hg↓** (hitam) + **Hg(NH₂)Cl↓** (putih) → **Hg₂²⁺ ✅**")
+
     st.divider()
 
-    # GOLONGAN III
+    # ── GOLONGAN III ─────────────────────────────────────────────
     st.subheader("🟦 Golongan III — Fe³⁺, Al³⁺, Cr³⁺")
+
+    # Langkah 1
     with st.container(border=True):
-        st.markdown("**Filtrat dari Gol. I** → + NH₄OH + NH₄Cl")
-        col1, col2 = st.columns(2)
-        with col1:
+        st.markdown("**FILTRAT dari Golongan I** mengandung Fe³⁺, Al³⁺, Cr³⁺")
+        st.markdown("⬇️ **+ NH₄OH + NH₄Cl**")
+        col_end3, col_fil3 = st.columns(2)
+        with col_end3:
             with st.container(border=True):
-                st.markdown("**⬇️ Endapan:** Fe(OH)₃ (Coklat), Al(OH)₃ (Putih/Gel), Cr(OH)₃ (Abu-abu)")
-                st.markdown("→ + NaOH berlebih + H₂O₂")
-                ca, cb = st.columns(2)
-                with ca:
-                    with st.container(border=True):
-                        st.markdown("**Residu:** Fe(OH)₃ (tidak larut)")
-                        st.markdown("→ + HCl + KSCN")
-                        st.success("🔴 [Fe(SCN)]²⁺\nMerah Darah\n\n**Fe³⁺ ✅**")
-                with cb:
-                    with st.container(border=True):
-                        st.markdown("**Filtrat:** [Al(OH)₄]⁻ + CrO₄²⁻")
-                        caa, cab = st.columns(2)
-                        with caa:
-                            with st.container(border=True):
-                                st.markdown("→ + HCl perlahan")
-                                st.success("⚪ Al(OH)₃↓\nPutih/Gel\n\n**Al³⁺ ✅**")
-                        with cab:
-                            with st.container(border=True):
-                                st.markdown("→ + Pb(NO₃)₂")
-                                st.success("🟡 PbCrO₄↓\nKuning\n\n**Cr³⁺ ✅**")
-        with col2:
+                st.markdown("**ENDAPAN:**")
+                st.markdown("🟤 Fe(OH)₃ — Coklat")
+                st.markdown("⚪ Al(OH)₃ — Putih/Gel")
+                st.markdown("🔘 Cr(OH)₃ — Abu-abu/Hijau")
+        with col_fil3:
             with st.container(border=True):
-                st.markdown("**→ Filtrat ke Golongan IV**")
+                st.markdown("**FILTRAT** → lanjut ke Golongan IV")
                 st.caption("Ba²⁺, Sr²⁺, Ca²⁺")
 
+    # Langkah 2
+    st.markdown("⬇️ Endapan + **NaOH berlebih + H₂O₂**")
+    col_fe, col_alcr = st.columns(2)
+    with col_fe:
+        with st.container(border=True):
+            st.markdown("**RESIDU: Fe(OH)₃** — tidak larut dalam basa")
+            st.markdown("⬇️ + HCl → larutkan, lalu + KSCN")
+            st.success("🔴 **[Fe(SCN)]²⁺** — Merah Darah → **Fe³⁺ ✅**")
+    with col_alcr:
+        with st.container(border=True):
+            st.markdown("**FILTRAT: [Al(OH)₄]⁻ + CrO₄²⁻** — keduanya larut")
+
+    # Langkah 3
+    st.markdown("⬇️ Filtrat dipisah untuk konfirmasi Al³⁺ dan Cr³⁺")
+    col_al, col_cr = st.columns(2)
+    with col_al:
+        with st.container(border=True):
+            st.markdown("**[Al(OH)₄]⁻**")
+            st.markdown("⬇️ + HCl perlahan (asamkan)")
+            st.success("⚪ **Al(OH)₃↓** — Putih/Gel → **Al³⁺ ✅**")
+    with col_cr:
+        with st.container(border=True):
+            st.markdown("**CrO₄²⁻** (filtrat berwarna kuning)")
+            st.markdown("⬇️ + Pb(NO₃)₂")
+            st.success("🟡 **PbCrO₄↓** — Kuning → **Cr³⁺ ✅**")
+
     st.divider()
 
-    # GOLONGAN IV
+    # ── GOLONGAN IV ──────────────────────────────────────────────
     st.subheader("🟨 Golongan IV — Ba²⁺, Sr²⁺, Ca²⁺")
+
+    # Langkah 1
     with st.container(border=True):
-        st.markdown("**Filtrat dari Gol. III** → + (NH₄)₂CO₃ + NH₄OH + NH₄Cl")
-        col1, col2 = st.columns(2)
-        with col1:
+        st.markdown("**FILTRAT dari Golongan III** mengandung Ba²⁺, Sr²⁺, Ca²⁺")
+        st.markdown("⬇️ **+ (NH₄)₂CO₃ + NH₄OH + NH₄Cl**")
+        col_end4, col_fil4 = st.columns(2)
+        with col_end4:
             with st.container(border=True):
-                st.markdown("**⬇️ Endapan Putih:** BaCO₃, SrCO₃, CaCO₃")
-                st.markdown("→ + CH₃COOH (larutkan)")
-                st.markdown("→ Larutan asetat Ba²⁺, Sr²⁺, Ca²⁺")
-                st.markdown("→ + K₂CrO₄")
-                ca, cb = st.columns(2)
-                with ca:
-                    with st.container(border=True):
-                        st.success("🟡 BaCrO₄↓\nKuning\n\n**Ba²⁺ ✅**")
-                with cb:
-                    with st.container(border=True):
-                        st.markdown("**Filtrat:** Sr²⁺, Ca²⁺")
-                        st.markdown("→ + (NH₄)₂SO₄")
-                        caa, cab = st.columns(2)
-                        with caa:
-                            with st.container(border=True):
-                                st.success("⚪ SrSO₄↓\nPutih\n\n**Sr²⁺ ✅**")
-                        with cab:
-                            with st.container(border=True):
-                                st.markdown("Filtrat Ca²⁺")
-                                st.markdown("→ + (NH₄)₂C₂O₄")
-                                st.success("⚪ CaC₂O₄↓\nPutih\n\n**Ca²⁺ ✅**")
-        with col2:
+                st.markdown("**ENDAPAN PUTIH:**")
+                st.markdown("BaCO₃, SrCO₃, CaCO₃")
+        with col_fil4:
             with st.container(border=True):
-                st.markdown("**→ Filtrat Golongan V**")
-                st.caption("(tidak dianalisis)")
+                st.markdown("**FILTRAT** → Golongan V")
+                st.caption("Mg²⁺, K⁺, Na⁺, NH₄⁺ — tidak dianalisis")
+
+    # Langkah 2
+    st.markdown("⬇️ Endapan + **CH₃COOH** → semua larut → + **K₂CrO₄**")
+    col_ba, col_srcа = st.columns(2)
+    with col_ba:
+        with st.container(border=True):
+            st.success("🟡 **BaCrO₄↓** — Kuning → **Ba²⁺ ✅**")
+    with col_srcа:
+        with st.container(border=True):
+            st.markdown("**FILTRAT: Sr²⁺ + Ca²⁺** — tetap larut")
+
+    # Langkah 3
+    st.markdown("⬇️ Filtrat + **(NH₄)₂SO₄**")
+    col_sr, col_ca = st.columns(2)
+    with col_sr:
+        with st.container(border=True):
+            st.success("⚪ **SrSO₄↓** — Putih → **Sr²⁺ ✅**")
+    with col_ca:
+        with st.container(border=True):
+            st.markdown("**FILTRAT: Ca²⁺** — tetap larut")
+            st.markdown("⬇️ + (NH₄)₂C₂O₄")
+            st.success("⚪ **CaC₂O₄↓** — Putih → **Ca²⁺ ✅**")
 
 # ============================================
 # HALAMAN: DETAIL REAKSI
