@@ -1,18 +1,14 @@
 import streamlit as st
-
-from streamlit_agraph import agraph, Node, Edge, Config
-
 import random
 
-# ============================================
-# IMPORT SOAL DARI STORAGE
-# ============================================
+# ============================================================
+# IMPORT CSS — SELALU LETAKKAN SEBELUM set_page_config
+# ============================================================
+# (set_page_config harus jadi pemanggilan pertama)
 
-from quiz_storage import get_random_questions
-
-# ============================================
+# ============================================================
 # KONFIGURASI HALAMAN
-# ============================================
+# ============================================================
 st.set_page_config(
     page_title="Analisis Kation Golongan I, III, IV",
     page_icon="⚗️",
@@ -20,9 +16,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ============================================
+# Inject CSS setelah set_page_config
+from styles import inject_css, subheader_golongan
+inject_css()
+
+# ============================================================
 # DATA KATION
-# ============================================
+# ============================================================
 
 cation_data = {
     "Golongan I": {
@@ -135,9 +135,9 @@ cation_data = {
     }
 }
 
-# ============================================
+# ============================================================
 # QUIZ QUESTIONS
-# ============================================
+# ============================================================
 
 quiz_questions = {
     "Golongan I": [
@@ -363,15 +363,17 @@ quiz_questions = {
     ]
 }
 
+
 def get_random_questions(group, n=10):
     questions = quiz_questions.get(group, [])
     if len(questions) <= n:
         return random.sample(questions, len(questions))
     return random.sample(questions, n)
 
-# ============================================
-# DIGITALISASI KIMIA - DATA
-# ============================================
+
+# ============================================================
+# DIGITALISASI KIMIA — DATA
+# ============================================================
 
 CATION_PROFILES = {
     "Ag⁺": {
@@ -570,9 +572,10 @@ DIG_QUESTIONS = [
 
 DIG_Q_MAP = {q["id"]: q for q in DIG_QUESTIONS}
 
-# ============================================
-# DIGITALISASI KIMIA - RENDER
-# ============================================
+
+# ============================================================
+# DIGITALISASI KIMIA — RENDER
+# ============================================================
 
 def render_digitalisasi():
     st.title("🔍 Digitalisasi Analisis Kation")
@@ -582,14 +585,14 @@ def render_digitalisasi():
     if "dig_current" not in st.session_state:
         st.session_state.dig_current = "q1"
         st.session_state.dig_history = []
-        st.session_state.dig_result  = None
+        st.session_state.dig_result = None
 
     col_r, col_s = st.columns([8, 2])
     with col_s:
         if st.button("🔄 Reset", use_container_width=True):
             st.session_state.dig_current = "q1"
             st.session_state.dig_history = []
-            st.session_state.dig_result  = None
+            st.session_state.dig_result = None
             st.rerun()
 
     if st.session_state.dig_history:
@@ -598,7 +601,6 @@ def render_digitalisasi():
                 icon = "✅" if ans else "❌"
                 st.write(f"{i}. {icon} {DIG_Q_MAP[qid]['text']}")
 
-    # Show result
     if st.session_state.dig_result:
         result_key = st.session_state.dig_result
 
@@ -642,7 +644,6 @@ def render_digitalisasi():
                     st.divider()
         return
 
-    # Current question
     curr_id = st.session_state.dig_current
     if curr_id not in DIG_Q_MAP:
         return
@@ -652,7 +653,6 @@ def render_digitalisasi():
     answered = len(st.session_state.dig_history)
 
     st.progress(answered / total_q, text=f"Pertanyaan {answered+1} dari ~{total_q}")
-
     st.info(f"### 🔬 {q['text']}\n\n💡 *{q['hint']}*")
 
     col_yes, col_no = st.columns(2)
@@ -675,9 +675,10 @@ def render_digitalisasi():
                 st.session_state.dig_current = nxt
             st.rerun()
 
-# ============================================
+
+# ============================================================
 # SIDEBAR
-# ============================================
+# ============================================================
 
 st.sidebar.title("⚗️ Analisis Kation")
 st.sidebar.divider()
@@ -690,11 +691,12 @@ page = st.sidebar.radio(
 )
 
 st.sidebar.divider()
-st.sidebar.caption("Mencakup Golongan I, III, dan IV\nVersi 3.0 | 2026")
+st.sidebar.caption("Mencakup Golongan I, III, dan IV\nVersi 3.1 | 2026")
 
-# ============================================
+
+# ============================================================
 # HALAMAN: BERANDA
-# ============================================
+# ============================================================
 
 if page == "🏠 Beranda":
     st.title("⚗️ Analisis Kation Golongan I, III, IV")
@@ -705,40 +707,58 @@ if page == "🏠 Beranda":
 
     with col1:
         st.subheader("🔬 Kation yang Dianalisis")
-        data_tabel = {
-            "Golongan": ["I", "III", "IV"],
-            "Kation": ["Ag⁺, Pb²⁺, Hg₂²⁺", "Fe³⁺, Al³⁺, Cr³⁺", "Ba²⁺, Sr²⁺, Ca²⁺"],
-            "Reagen Pengendap": ["HCl encer", "NH₄OH + NH₄Cl", "(NH₄)₂CO₃ + NH₄OH + NH₄Cl"],
-            "Warna Endapan": ["Putih", "Coklat/Putih/Abu-abu", "Putih"],
-        }
-        st.table(data_tabel)
 
-        st.warning("⚠️ **Catatan:** Golongan II dan V **tidak dibahas** dalam aplikasi ini. Golongan II (Cu²⁺, Cd²⁺, Bi³⁺, Hg²⁺, Sn²⁺, Sb³⁺, As³⁺) dilewati, dan Golongan V (Mg²⁺, K⁺, Na⁺, NH₄⁺) tidak tercakup.")
+        # Kartu berwarna per golongan (lebih menarik dari st.table biasa)
+        subheader_golongan("I", "Ag⁺, Pb²⁺, Hg₂²⁺")
+        st.markdown(
+            '<div style="padding:0.5rem 1rem 0.5rem 1.25rem;font-size:0.9rem;">'
+            '🧪 <b>Reagen:</b> HCl encer &nbsp;|&nbsp; 🎨 <b>Endapan:</b> Putih</div>',
+            unsafe_allow_html=True
+        )
+
+        subheader_golongan("III", "Fe³⁺, Al³⁺, Cr³⁺")
+        st.markdown(
+            '<div style="padding:0.5rem 1rem 0.5rem 1.25rem;font-size:0.9rem;">'
+            '🧪 <b>Reagen:</b> NH₄OH + NH₄Cl &nbsp;|&nbsp; 🎨 <b>Endapan:</b> Coklat/Putih/Abu-abu</div>',
+            unsafe_allow_html=True
+        )
+
+        subheader_golongan("IV", "Ba²⁺, Sr²⁺, Ca²⁺")
+        st.markdown(
+            '<div style="padding:0.5rem 1rem 0.5rem 1.25rem;font-size:0.9rem;">'
+            '🧪 <b>Reagen:</b> (NH₄)₂CO₃ + NH₄OH + NH₄Cl &nbsp;|&nbsp; 🎨 <b>Endapan:</b> Putih</div>',
+            unsafe_allow_html=True
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.warning("⚠️ **Catatan:** Golongan II dan V **tidak dibahas** dalam aplikasi ini.")
 
     with col2:
         st.subheader("🗂️ Fitur Aplikasi")
         features = [
-            ("🔍", "Digitalisasi Kimia", "Identifikasi kation secara interaktif melalui tanya-jawab observasi lab"),
-            ("📊", "Bagan Analisis", "Visualisasi alur analisis dari sampel hingga konfirmasi kation"),
-            ("🔬", "Detail Reaksi", "Penjelasan step-by-step setiap reaksi kimia"),
-            ("📝", "Kuis Interaktif", "Uji pemahaman dengan 10 soal acak per golongan"),
-            ("📚", "Referensi", "Tabel warna endapan dan rangkuman reaksi lengkap"),
+            ("🔍", "Digitalisasi Kimia", "Identifikasi kation via tanya-jawab lab interaktif"),
+            ("📊", "Bagan Analisis", "Alur visual dari sampel hingga konfirmasi"),
+            ("🔬", "Detail Reaksi", "Step-by-step setiap reaksi kimia"),
+            ("📝", "Kuis Interaktif", "10 soal acak per golongan"),
+            ("📚", "Referensi", "Tabel warna endapan & rangkuman"),
         ]
         for icon, title, desc in features:
             with st.container(border=True):
                 st.markdown(f"**{icon} {title}**")
                 st.caption(desc)
 
-# ============================================
+
+# ============================================================
 # HALAMAN: DIGITALISASI KIMIA
-# ============================================
+# ============================================================
 
 elif page == "🔍 Digitalisasi Kimia":
     render_digitalisasi()
 
-# ============================================
+
+# ============================================================
 # HALAMAN: BAGAN ANALISIS
-# ============================================
+# ============================================================
 
 elif page == "📊 Bagan Analisis":
     st.title("📊 Bagan Alur Analisis Kation")
@@ -746,9 +766,8 @@ elif page == "📊 Bagan Analisis":
     st.divider()
 
     # ── GOLONGAN I ──────────────────────────────────────────────
-    st.subheader("⬛ Golongan I — Ag⁺, Pb²⁺, Hg₂²⁺")
+    subheader_golongan("I", "Ag⁺, Pb²⁺, Hg₂²⁺")
 
-    # Langkah 1
     with st.container(border=True):
         st.markdown("**🧪 SAMPEL** mengandung Ag⁺, Pb²⁺, Hg₂²⁺")
         st.markdown("⬇️ **+ HCl encer**")
@@ -762,7 +781,6 @@ elif page == "📊 Bagan Analisis":
                 st.markdown("**FILTRAT** → lanjut ke Golongan III")
                 st.caption("(skip Golongan II)")
 
-    # Langkah 2
     st.markdown("⬇️ Endapan + **H₂O panas**")
     col_pb, col_sisa = st.columns(2)
     with col_pb:
@@ -775,7 +793,6 @@ elif page == "📊 Bagan Analisis":
             st.markdown("**RESIDU: AgCl + Hg₂Cl₂** (tidak larut)")
             st.markdown("⬇️ + NH₄OH")
 
-    # Langkah 3
     st.markdown("⬇️ Residu + **NH₄OH**")
     col_ag, col_hg = st.columns(2)
     with col_ag:
@@ -785,15 +802,14 @@ elif page == "📊 Bagan Analisis":
             st.success("⚪ **AgCl↓** — Putih → **Ag⁺ ✅**")
     with col_hg:
         with st.container(border=True):
-            st.markdown("**RESIDU: Hg₂Cl₂** (tidak larut dalam NH₄OH)")
+            st.markdown("**RESIDU: Hg₂Cl₂**")
             st.success("⚫ **Hg↓** (hitam) + **Hg(NH₂)Cl↓** (putih) → **Hg₂²⁺ ✅**")
 
     st.divider()
 
     # ── GOLONGAN III ─────────────────────────────────────────────
-    st.subheader("🟦 Golongan III — Fe³⁺, Al³⁺, Cr³⁺")
+    subheader_golongan("III", "Fe³⁺, Al³⁺, Cr³⁺")
 
-    # Langkah 1
     with st.container(border=True):
         st.markdown("**FILTRAT dari Golongan I** mengandung Fe³⁺, Al³⁺, Cr³⁺")
         st.markdown("⬇️ **+ NH₄OH + NH₄Cl**")
@@ -809,38 +825,35 @@ elif page == "📊 Bagan Analisis":
                 st.markdown("**FILTRAT** → lanjut ke Golongan IV")
                 st.caption("Ba²⁺, Sr²⁺, Ca²⁺")
 
-    # Langkah 2
     st.markdown("⬇️ Endapan + **NaOH berlebih + H₂O₂**")
     col_fe, col_alcr = st.columns(2)
     with col_fe:
         with st.container(border=True):
-            st.markdown("**RESIDU: Fe(OH)₃** — tidak larut dalam basa")
-            st.markdown("⬇️ + HCl → larutkan, lalu + KSCN")
+            st.markdown("**RESIDU: Fe(OH)₃**")
+            st.markdown("⬇️ + HCl → + KSCN")
             st.success("🔴 **[Fe(SCN)]²⁺** — Merah Darah → **Fe³⁺ ✅**")
     with col_alcr:
         with st.container(border=True):
-            st.markdown("**FILTRAT: [Al(OH)₄]⁻ + CrO₄²⁻** — keduanya larut")
+            st.markdown("**FILTRAT: [Al(OH)₄]⁻ + CrO₄²⁻**")
 
-    # Langkah 3
-    st.markdown("⬇️ Filtrat dipisah untuk konfirmasi Al³⁺ dan Cr³⁺")
+    st.markdown("⬇️ Filtrat dipisah → konfirmasi Al³⁺ dan Cr³⁺")
     col_al, col_cr = st.columns(2)
     with col_al:
         with st.container(border=True):
             st.markdown("**[Al(OH)₄]⁻**")
-            st.markdown("⬇️ + HCl perlahan (asamkan)")
+            st.markdown("⬇️ + HCl perlahan")
             st.success("⚪ **Al(OH)₃↓** — Putih/Gel → **Al³⁺ ✅**")
     with col_cr:
         with st.container(border=True):
-            st.markdown("**CrO₄²⁻** (filtrat berwarna kuning)")
+            st.markdown("**CrO₄²⁻** (kuning)")
             st.markdown("⬇️ + Pb(NO₃)₂")
             st.success("🟡 **PbCrO₄↓** — Kuning → **Cr³⁺ ✅**")
 
     st.divider()
 
     # ── GOLONGAN IV ──────────────────────────────────────────────
-    st.subheader("🟨 Golongan IV — Ba²⁺, Sr²⁺, Ca²⁺")
+    subheader_golongan("IV", "Ba²⁺, Sr²⁺, Ca²⁺")
 
-    # Langkah 1
     with st.container(border=True):
         st.markdown("**FILTRAT dari Golongan III** mengandung Ba²⁺, Sr²⁺, Ca²⁺")
         st.markdown("⬇️ **+ (NH₄)₂CO₃ + NH₄OH + NH₄Cl**")
@@ -854,17 +867,15 @@ elif page == "📊 Bagan Analisis":
                 st.markdown("**FILTRAT** → Golongan V")
                 st.caption("Mg²⁺, K⁺, Na⁺, NH₄⁺ — tidak dianalisis")
 
-    # Langkah 2
     st.markdown("⬇️ Endapan + **CH₃COOH** → semua larut → + **K₂CrO₄**")
-    col_ba, col_srcа = st.columns(2)
+    col_ba, col_srca = st.columns(2)
     with col_ba:
         with st.container(border=True):
             st.success("🟡 **BaCrO₄↓** — Kuning → **Ba²⁺ ✅**")
-    with col_srcа:
+    with col_srca:
         with st.container(border=True):
             st.markdown("**FILTRAT: Sr²⁺ + Ca²⁺** — tetap larut")
 
-    # Langkah 3
     st.markdown("⬇️ Filtrat + **(NH₄)₂SO₄**")
     col_sr, col_ca = st.columns(2)
     with col_sr:
@@ -872,13 +883,14 @@ elif page == "📊 Bagan Analisis":
             st.success("⚪ **SrSO₄↓** — Putih → **Sr²⁺ ✅**")
     with col_ca:
         with st.container(border=True):
-            st.markdown("**FILTRAT: Ca²⁺** — tetap larut")
+            st.markdown("**FILTRAT: Ca²⁺**")
             st.markdown("⬇️ + (NH₄)₂C₂O₄")
             st.success("⚪ **CaC₂O₄↓** — Putih → **Ca²⁺ ✅**")
 
-# ============================================
+
+# ============================================================
 # HALAMAN: DETAIL REAKSI
-# ============================================
+# ============================================================
 
 elif page == "🔬 Detail Reaksi":
     st.title("🔬 Detail Reaksi Analisis")
@@ -943,9 +955,10 @@ elif page == "🔬 Detail Reaksi":
             catatan="💡 **NH₄Cl** mencegah pengendapan MgCO₃ yang tidak diinginkan."
         )
 
-# ============================================
+
+# ============================================================
 # HALAMAN: KUIS
-# ============================================
+# ============================================================
 
 elif page == "📝 Kuis":
     st.title("📝 Kuis Analisis Kation")
@@ -1036,9 +1049,10 @@ elif page == "📝 Kuis":
             }
             st.rerun()
 
-# ============================================
+
+# ============================================================
 # HALAMAN: REFERENSI
-# ============================================
+# ============================================================
 
 elif page == "📚 Referensi":
     st.title("📚 Referensi & Tabel Ringkasan")
