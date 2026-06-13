@@ -19,6 +19,7 @@ st.set_page_config(
 # Inject CSS setelah set_page_config
 from styles import inject_css, subheader_golongan
 inject_css()
+render_theme_toggle()
 
 # ============================================================
 # DATA KATION
