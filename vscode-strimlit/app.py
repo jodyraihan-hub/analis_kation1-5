@@ -6,6 +6,35 @@ import random
 # ============================================================
 # (set_page_config harus jadi pemanggilan pertama)
 
+def inject_custom_css():
+    st.markdown("""
+    <style>
+    /* Background utama */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
+    }
+    
+    /* Sidebar background */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #020617 0%, #0f172a 100%) !important;
+    }
+    
+    /* Warna teks */
+    h1, h2, h3, h4, h5, h6, p, span, label {
+        color: #f8fafc !important;
+    }
+    
+    /* Card/container border */
+    div[data-testid="stVerticalBlock"] > div[style*="border"] {
+        background: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        border-radius: 12px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+inject_custom_css() 
+
 # ============================================================
 # KONFIGURASI HALAMAN
 # ============================================================
